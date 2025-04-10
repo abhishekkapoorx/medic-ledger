@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ReduxProvider from "@/providers/redux-provider";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -41,6 +42,7 @@ export default function RootLayout({
             <Header />
             {children}
             {/* <Footer /> */}
+            <Toaster />
           </ThemeProvider>
         </ReduxProvider>
       </body>
