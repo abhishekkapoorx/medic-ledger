@@ -1,0 +1,85 @@
+"use client";
+
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { setAccount, clearAccount } from "@/redux/walletSlice";
+// import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (request: { method: string; params?: any[] }) => Promise<any>;
+    };
+  }
+}
+
+const ConnectWalletButton: React.FC = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const account = useSelector((state: RootState) => state.wallet.account);
+  const [loading, setLoading] = useState(false);
+
+  const handleConnectWallet = async () => {
+    try {
+      if (!window.ethereum) {
+        alert("MetaMask is not installed. Please install it to use this app!");
+        return;
+      }
+      setLoading(true);
+  
+      // Request accounts from MetaMask
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (accounts.length > 0) {
+        dispatch(setAccount(accounts[0]));
+  
+        // Check if user is registered
+        const response = await fetch(`/api/check-user?address=${accounts[0]}`);
+        const data = await response.json();
+  
+        if (data.error) {
+          // Handle API errors
+          alert(data.error || "An error occurred.");
+          return;
+        }
+  
+        if (data.isRegistered) {
+          // If the user is registered, go to their dashboard
+          router.push("/dashboard");
+        } else {
+          // If user is not registered, redirect to registration page
+          router.push("/register");
+        }
+      }
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      alert("Failed to connect wallet. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+
+  const handleDisconnectWallet = () => {
+    dispatch(clearAccount());
+  };
+
+  return (
+    <div>
+      {account ? (
+        <div>
+          <p>Connected: {account}</p>
+          <button onClick={handleDisconnectWallet}>Disconnect Wallet</button>
+        </div>
+      ) : (
+        <button onClick={handleConnectWallet} disabled={loading}>
+          {loading ? "Connecting..." : "Connect MetaMask Wallet"}
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default ConnectWalletButton;
