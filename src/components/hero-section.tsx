@@ -6,13 +6,17 @@ import { useInView } from "react-intersection-observer"
 import gsap from "gsap"
 import Link from "next/link"
 import ConnectWalletButton from "./ConnectWalletButton"
-import  Spline  from "@splinetool/react-spline"
+import Spline from "@splinetool/react-spline"
+import { useSelector } from "react-redux"
+import { RootState } from "@/redux/store"
 
 export default function HeroSection() {
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
+
+  const userData = useSelector((state: RootState) => state.user)
 
   const headRef = useRef(null)
   const circleRef = useRef(null)
@@ -78,7 +82,7 @@ export default function HeroSection() {
   return (
     <section ref={ref} className="relative min-h-screen  max-w-7xl mx-auto overflow-hidden bg-[#141414] flex items-center ">
       {/* Background gradient effect */}
-     
+
 
       <div className="container mx-auto px-4 z-10 flex flex-col md:flex-row items-center">
         <div className="w-full md:w-1/2 pt-20 md:pt-0">
@@ -88,7 +92,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            
+
             <span className="text-[#308E70]">Medic Ledger</span> <br />Revolutionizing Drug <br />
             Authentication
           </motion.h1>
@@ -103,33 +107,45 @@ export default function HeroSection() {
           </motion.p>
 
           <div className="hero-buttons flex flex-wrap gap-4">
-            <ConnectWalletButton/>
-            <Link
-              href="#contactanos"
+            <ConnectWalletButton />
+
+            { userData && userData.isActive ? (
+              <Link
+              href="/dashboard"
+              className="border border-[#FFFAFA]/30 text-[#FFFAFA] px-6 py-3 rounded-md hover:bg-[#FFFAFA]/10 transition-all"
+            >
+              Dashboard
+            </Link>
+            ) : (
+              <Link
+              href="/register"
               className="border border-[#FFFAFA]/30 text-[#FFFAFA] px-6 py-3 rounded-md hover:bg-[#FFFAFA]/10 transition-all"
             >
               Register
             </Link>
+            )}
+            
+            
           </div>
         </div>
 
         <div className="w-full md:w-1/2 mt-12 md:mt-0 relative">
-         
+
           {/* <div ref={headRef} className="relative mx-auto w-[300px] h-[400px] md:w-[400px] md:h-[500px]"> */}
-        
-           
-           <Spline
-        scene="https://prod.spline.design/Jj9dJqxsVvKoDH24/scene.splinecode" 
-        className="md:w-1/2"
-      />
-      </div>
 
 
-            {/* Head silhouette */}
-            {/* <div className="absolute inset-0 bg-[url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Mee2kMBCERKpDoLf6BNwh9eTtKBlo8.png')] bg-contain bg-center bg-no-repeat"></div> */}
+          <Spline
+            scene="https://prod.spline.design/Jj9dJqxsVvKoDH24/scene.splinecode"
+            className="md:w-1/2"
+          />
+        </div>
 
-            {/* Digital elements around the head */}
-            {/* {Array.from({ length: 8 }).map((_, i) => (
+
+        {/* Head silhouette */}
+        {/* <div className="absolute inset-0 bg-[url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Mee2kMBCERKpDoLf6BNwh9eTtKBlo8.png')] bg-contain bg-center bg-no-repeat"></div> */}
+
+        {/* Digital elements around the head */}
+        {/* {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
                 className={`digital-element absolute w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#308E70] opacity-80 blur-sm`}
@@ -141,8 +157,8 @@ export default function HeroSection() {
               ></div>
             ))} */}
 
-            {/* Digital circuit lines */}
-            {/* {Array.from({ length: 6 }).map((_, i) => (
+        {/* Digital circuit lines */}
+        {/* {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={`line-${i}`}
                 className="digital-element absolute h-[1px] bg-gradient-to-r from-[#308E70] to-transparent"
@@ -154,7 +170,7 @@ export default function HeroSection() {
                 }}
               ></div>
             ))} */}
-          {/* </div>
+        {/* </div>
         </div> */}
       </div>
     </section>

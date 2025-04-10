@@ -144,7 +144,7 @@ const RegisterPage = () => {
       router.push("/dashboard");
     } catch (error: any) {
       console.error("Registration failed:", error);
-      setError(error.message || "Registration failed. Please try again.");
+      setError(error.reason || error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
