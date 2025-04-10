@@ -125,6 +125,9 @@ export default function HeroSection() {
          scene="https://prod.spline.design/FJDPOlQagsje2F93/scene.splinecode" 
         style={{ width: "200px", height: "200px" }}
       /> */}
+        <Spline
+        scene="https://prod.spline.design/i5jLsUojN5uvdgh9/scene.splinecode" 
+      />
 
             {/* Head silhouette */}
             {/* <div className="absolute inset-0 bg-[url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Mee2kMBCERKpDoLf6BNwh9eTtKBlo8.png')] bg-contain bg-center bg-no-repeat"></div> */}

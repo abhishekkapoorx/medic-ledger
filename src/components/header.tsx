@@ -69,8 +69,8 @@ export default function Header() {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link href="/" className="header-logo flex items-center">
           <div className="flex items-center">
-            <span className="text-[#308E70] font-bold text-2xl">Med</span>
-            <span className="text-[#FFFAFA] font-bold text-2xl">ML</span>
+            <span className="text-[#308E70] font-bold text-2xl">Medic</span>
+            <span className="text-[#FFFAFA] font-bold text-2xl">Ledger</span>
           </div>
         </Link>
 
