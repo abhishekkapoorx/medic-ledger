@@ -31,7 +31,6 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${robotoMono.variable} antialiased`}
       >
-      <Header />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -39,15 +38,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
 
-          {/* <Navbar /> */}
           <Header />
           <div className="">
             {children}
           </div>
 
+          <Footer />
         </ThemeProvider>
       </body>
-      <Footer />
     </html>
   );
 }
