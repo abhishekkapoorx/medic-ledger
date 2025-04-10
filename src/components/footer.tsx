@@ -75,39 +75,49 @@ export default function Footer() {
                 <span className="text-[#141414] font-bold text-2xl">Ledger</span>
               </div>
             </Link>
-            <p className="text-[#FFFAFA]/80 text-sm mt-2 text-justify">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde dolor sunt laborum blanditiis aperiam? Corrupti, distinctio nostrum! Dignissimos aliquid eius quaerat ad officiis beatae amet possimus cupiditate dolores culpa veniam blanditiis expedita, nihil ducimus.
+            <p className="text-[#FFFAFA]/80 text-sm mt-2 text-justify max-w-2xl">
+              Medic Ledger is a blockchain-based platform for securely managing prescription medicines, ensuring transparency and authenticity through NFT-based prescription and medicine tracking.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:flex md:space-x-8">
             <div className="mb-6 md:mb-0">
-              <h3 className="text-[#FFFAFA] font-bold mb-3">Explora</h3>
+              <h3 className="text-[#FFFAFA] font-bold mb-3">Explore more</h3>
               <ul className="space-y-2">
                 <li className="footer-nav-item">
-                  <Link href="#nosotros" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
+                  <Link href="/" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
                     Home
                   </Link>
                 </li>
                 <li className="footer-nav-item">
-                  <Link href="#testimonios" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
-                   About
+                  <Link href="dashboard" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
+                    Dashboard
                   </Link>
                 </li>
                 <li className="footer-nav-item">
-                  <Link href="#demo" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
-                   marketplace
+                  <Link href="#marketplace" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
+                    Marketplace
+                  </Link>
+                </li>
+                <li className="footer-nav-item">
+                  <Link href="#prescription" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
+                    Prescription
+                  </Link>
+                </li>
+                <li className="footer-nav-item">
+                  <Link href="#medicine" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
+                    Medicine
                   </Link>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-[#FFFAFA] font-bold mb-3">Suscríbete to medic ledger</h3>
+              <h3 className="text-[#FFFAFA] font-bold mb-3">Subscribe to medic ledger</h3>
               <div className="newsletter-section flex mt-2">
                 <input
                   type="email"
-                  placeholder="Tu Email"
+                  placeholder="Your Email"
                   className="bg-[#FFFAFA]/10 border border-[#FFFAFA]/20 rounded-l-md px-4 py-2 text-[#FFFAFA] focus:outline-none flex-grow"
                 />
                 <button className="bg-[#141414] text-[#FFFAFA] px-4 py-2 rounded-r-md hover:bg-[#141414]/80 transition-colors">
@@ -120,7 +130,7 @@ export default function Footer() {
 
         <div className="border-t border-[#FFFAFA]/20 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-[#FFFAFA]/60 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+            © {new Date().getFullYear()} Medic Ledger. All rights reserved.
           </p>
 
           <div className="designer-credit flex items-center">
@@ -131,7 +141,7 @@ export default function Footer() {
               <p className="text-[#FFFAFA] text-sm">
                 Lorem ipsum dolor sit amet.
                 <br />
-                <span className="text-[#FFFAFA]/60 text-xs">@kristinnebarrera</span>
+                <span className="text-[#FFFAFA]/60 text-xs">@teammedicledger</span>
               </p>
             </div>
           </div>
