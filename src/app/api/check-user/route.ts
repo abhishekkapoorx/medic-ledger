@@ -40,13 +40,23 @@ export async function GET(request: NextRequest) {
     const contract = new ethers.Contract(contractAddress, UserRegistryArtifact.abi, provider);
 
     // Fetch the user details
-    const [name, isVerified] = await contract.getUserDetails(address);
+    const [role, name, licenseIPFSHash, isVerified, isActive, registrationDate] = await contract.getUserDetails(address);
+
+    console.log("User details fetched:", { role, name, licenseIPFSHash, isVerified, isActive, registrationDate });
+
+    // Convert BigInt fields to strings
+    const roleStr = role.toString();  // Convert BigInt to string
+    const registrationDateStr = registrationDate.toString();  // Convert BigInt to string
 
     // Respond with registration status
     return NextResponse.json({ 
       isRegistered: name !== "", 
-      isVerified,
-      name
+      isVerified: isVerified.toString(), // Ensure boolean value is properly serialized
+      name,
+      role: roleStr,  // Return role as string
+      licenseIPFSHash,
+      isActive,
+      registrationDate: registrationDateStr // Return registration date as string
     });
   } catch (error) {
     if ((error as any).code === "CALL_EXCEPTION" && 

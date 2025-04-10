@@ -7,6 +7,7 @@ import { setAccount, clearAccount } from "@/redux/walletSlice";
 // import { useRouter } from "next/router";
 import { useRouter } from "next/navigation";
 import truncateEthAddress from 'truncate-eth-address'
+import { setUserDetails } from "@/redux/userSlice";
 
 declare global {
   interface Window {
@@ -44,10 +45,19 @@ const ConnectWalletButton: React.FC = () => {
           alert(data.error || "An error occurred.");
           return;
         }
+
+        console.log("User data:", data); // Log the user data for debugging
   
         if (data.isRegistered) {
-          // If the user is registered, go to their dashboard
-          router.push("/dashboard");
+          dispatch(setUserDetails({
+            role: data.role,
+            name: data.name,
+            licenseIPFSHash: data.licenseIPFSHash,
+            isVerified: data.isVerified === 'true',  // Convert to boolean if necessary
+            isActive: data.isActive === 'true',  // Convert to boolean if necessary
+            registrationDate: data.registrationDate,
+          }));
+          // router.push("/dashboard");
         } else {
           // If user is not registered, redirect to registration page
           router.push("/register");
@@ -60,6 +70,7 @@ const ConnectWalletButton: React.FC = () => {
       setLoading(false);
     }
   };
+  
   
   
 

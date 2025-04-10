@@ -141,7 +141,7 @@ const RegisterPage = () => {
       console.log("Registration successful!");
 
       // Redirect to dashboard after successful registration
-      router.push("/dashboard");
+      // router.push("/dashboard");
     } catch (error: any) {
       console.error("Registration failed:", error);
       setError(error.message || "Registration failed. Please try again.");
@@ -155,6 +155,13 @@ const RegisterPage = () => {
       setError("Please fill in all required fields");
       return;
     }
+    
+    // For patients, skip the document upload step and submit directly
+    if (step === 2 && role === "Patient") {
+      handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+      return;
+    }
+    
     setError("");
     setStep(step + 1);
   };
@@ -357,28 +364,26 @@ const RegisterPage = () => {
               disabled={!role || !validateRoleFields()}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-600 disabled:text-gray-400"
             >
-              Next
+              {role === "Patient" ? "Submit" : "Next"}
             </button>
           </div>
         </div>
       )}
 
-      {step === 3 && (
+      {step === 3 && role !== "Patient" && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-blue-400">
-            Step 3: Upload Your {role === "Donor" ? "Government ID" : role === "Patient" ? "Medical Records (Optional)" : "License"}
+            Step 3: Upload Your {role === "Donor" ? "Government ID" : "License"}
           </h2>
           <div>
             <label className="block text-gray-300 mb-2">
-              {role === "Patient" ? "Medical Records (Optional)" : 
-               role === "Donor" ? "Government ID Document" : 
-               "Professional License"}
+              {role === "Donor" ? "Government ID Document" : "Professional License"}
             </label>
             <input
               type="file"
               onChange={handleFileChange}
               className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-600 file:text-gray-200 hover:file:bg-gray-500"
-              required={role !== "Patient"}
+              required
             />
             {file && (
               <p className="mt-2 text-sm text-gray-400">
@@ -395,7 +400,7 @@ const RegisterPage = () => {
             </button>
             <button
               onClick={handleSubmit}
-              disabled={loading || !role || (role !== "Patient" && !file)}
+              disabled={loading || !file}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-600 disabled:text-gray-400"
             >
               {loading ? "Registering..." : "Submit"}
