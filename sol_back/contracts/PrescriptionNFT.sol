@@ -44,7 +44,7 @@ contract PrescriptionNFT is ERC721, Ownable {
     modifier onlyDoctor() {
         UserRegistry userRegistry = UserRegistry(userRegistryAddress);
         require(
-            userRegistry.isValidUser(msg.sender, UserRegistry.UserRole.Doctor),
+            userRegistry.isValidUser(msg.sender),
             "Only verified doctors can create prescriptions"
         );
         _;
@@ -53,7 +53,7 @@ contract PrescriptionNFT is ERC721, Ownable {
     modifier onlyValidPatient(address patient) {
         UserRegistry userRegistry = UserRegistry(userRegistryAddress);
         require(
-            userRegistry.isValidUser(patient, UserRegistry.UserRole.Patient),
+            userRegistry.isValidUser(patient),
             "Invalid patient address"
         );
         _;

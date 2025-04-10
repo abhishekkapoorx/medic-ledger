@@ -58,12 +58,7 @@ contract PharmacyMarketplace is Ownable, ReentrancyGuard {
     modifier onlyValidUser() {
         UserRegistry userRegistry = UserRegistry(userRegistryAddress);
         require(
-            userRegistry.isValidUser(msg.sender, UserRegistry.UserRole.Patient) ||
-            userRegistry.isValidUser(msg.sender, UserRegistry.UserRole.Doctor) ||
-            userRegistry.isValidUser(msg.sender, UserRegistry.UserRole.Manufacturer) ||
-            userRegistry.isValidUser(msg.sender, UserRegistry.UserRole.Distributor) ||
-            userRegistry.isValidUser(msg.sender, UserRegistry.UserRole.Retailer) ||
-            userRegistry.isValidUser(msg.sender, UserRegistry.UserRole.Donor),
+            userRegistry.isValidUser(msg.sender),
             "Unauthorized user"
         );
         _;
@@ -198,8 +193,8 @@ contract PharmacyMarketplace is Ownable, ReentrancyGuard {
 
         UserRegistry userRegistry = UserRegistry(userRegistryAddress);
         require(
-            userRegistry.isValidUser(recipient, UserRegistry.UserRole.Patient),
-            "Recipient must be a patient"
+            userRegistry.isValidUser(recipient),
+            "Recipient must be a valid user"
         );
 
         // Check prescription if required

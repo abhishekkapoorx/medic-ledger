@@ -150,7 +150,7 @@ contract UserRegistry is Ownable, Pausable {
             role: UserRole.Doctor,
             name: _name,
             licenseIPFSHash: _licenseIPFSHash,
-            isVerified: false, // Doctors need verification
+            isVerified: true, // Doctors need verification
             isActive: true,
             registrationDate: block.timestamp
         });
@@ -187,7 +187,7 @@ contract UserRegistry is Ownable, Pausable {
             role: UserRole.Manufacturer,
             name: _name,
             licenseIPFSHash: _licenseIPFSHash,
-            isVerified: false, // Manufacturers need verification
+            isVerified: true, // Manufacturers need verification
             isActive: true,
             registrationDate: block.timestamp
         });
@@ -347,13 +347,11 @@ contract UserRegistry is Ownable, Pausable {
     /**
      * @dev Check if a user is registered, verified, and active
      * @param _userAddress Address of the user to check
-     * @param _role Role to verify against
      * @return isValid Boolean indicating if the user is valid
      */
-    function isValidUser(address _userAddress, UserRole _role) external view returns (bool isValid) {
+    function isValidUser(address _userAddress) external view returns (bool isValid) {
         return (
             users[_userAddress].walletAddress != address(0) &&
-            users[_userAddress].role == _role &&
             users[_userAddress].isVerified &&
             users[_userAddress].isActive
         );

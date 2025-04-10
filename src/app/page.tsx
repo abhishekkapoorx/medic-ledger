@@ -11,6 +11,7 @@ import GenieSection from "@/components/genie-section"
 import TestimonialsSection from "@/components/testimonal"
 import TransformationSection from "@/components/transformation-section"
 import WhyAISection from "@/components/why-ai-section"
+import gsap from "gsap"
 
 export default function Home() {
   const circleRef = useRef(null)

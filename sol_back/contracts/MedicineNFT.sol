@@ -48,7 +48,7 @@ contract MedicineTokenizer is ERC721, Ownable {
     modifier onlyManufacturer() {
         UserRegistry userRegistry = UserRegistry(userRegistryAddress);
         require(
-            userRegistry.isValidUser(msg.sender, UserRegistry.UserRole.Manufacturer),
+            userRegistry.isValidUser(msg.sender),
             "Caller is not a verified manufacturer"
         );
         _;

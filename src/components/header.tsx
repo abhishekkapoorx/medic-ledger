@@ -5,6 +5,8 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import gsap from "gsap"
+import { Button } from "./ui/button"
+import ConnectWalletButton from "./ConnectWalletButton"
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -84,12 +86,7 @@ export default function Header() {
           <Link href="#contactanos" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
             Contáctanos
           </Link>
-          <Link
-            href="#demo"
-            className="cta-button bg-[#308E70] text-[#FFFAFA] px-6 py-2 rounded-md hover:bg-[#308E70]/80 transition-all transform hover:scale-105"
-          >
-            Solicitar Demo Gratis
-          </Link>
+          <ConnectWalletButton/>
         </nav>
 
         <button className="md:hidden text-[#FFFAFA]">

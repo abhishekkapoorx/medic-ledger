@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import gsap from "gsap"
 import Link from "next/link"
+import ConnectWalletButton from "./ConnectWalletButton"
 
 export default function HeroSection() {
   const { ref, inView } = useInView({
@@ -101,12 +102,7 @@ export default function HeroSection() {
           </motion.p>
 
           <div className="hero-buttons flex flex-wrap gap-4">
-            <Link
-              href="#demo"
-              className="bg-[#308E70] text-[#FFFAFA] px-6 py-3 rounded-md hover:bg-[#308E70]/80 transition-all transform hover:scale-105"
-            >
-              Connect your wallet
-            </Link>
+            <ConnectWalletButton/>
             <Link
               href="#contactanos"
               className="border border-[#FFFAFA]/30 text-[#FFFAFA] px-6 py-3 rounded-md hover:bg-[#FFFAFA]/10 transition-all"

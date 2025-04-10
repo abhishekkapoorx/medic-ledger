@@ -6,6 +6,7 @@ import { RootState } from "@/redux/store";
 import { setAccount, clearAccount } from "@/redux/walletSlice";
 // import { useRouter } from "next/router";
 import { useRouter } from "next/navigation";
+import truncateEthAddress from 'truncate-eth-address'
 
 declare global {
   interface Window {
@@ -67,14 +68,11 @@ const ConnectWalletButton: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="cta-button bg-[#308E70] text-[#FFFAFA] px-6 py-2 rounded-md hover:bg-[#308E70]/80 transition-all transform hover:scale-105 flex items-center justify-center">
       {account ? (
-        <div>
-          <p>Connected: {account}</p>
-          <button onClick={handleDisconnectWallet}>Disconnect Wallet</button>
-        </div>
+          <button onClick={handleDisconnectWallet} className="flex items-center justify-center">{truncateEthAddress(account)} Disconnect</button>
       ) : (
-        <button onClick={handleConnectWallet} disabled={loading}>
+        <button onClick={handleConnectWallet} disabled={loading}  className="flex items-center justify-center">
           {loading ? "Connecting..." : "Connect MetaMask Wallet"}
         </button>
       )}
