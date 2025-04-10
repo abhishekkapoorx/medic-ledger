@@ -78,32 +78,32 @@ export default function ApplicationsSection() {
 
   const applications = [
     {
-      icon: <FileCheck className="w-6 h-6 text-[#BF3131]" />,
+      icon: <FileCheck className="w-6 h-6 text-[#308E70]" />,
       title: "Codificación Inteligente",
     },
     {
-      icon: <Shield className="w-6 h-6 text-[#BF3131]" />,
+      icon: <Shield className="w-6 h-6 text-[#308E70]" />,
       title: "Redes de Identidad",
     },
     {
-      icon: <Globe className="w-6 h-6 text-[#BF3131]" />,
+      icon: <Globe className="w-6 h-6 text-[#308E70]" />,
       title: "Descubrimiento de Patrones",
     },
     {
-      icon: <Receipt className="w-6 h-6 text-[#BF3131]" />,
+      icon: <Receipt className="w-6 h-6 text-[#308E70]" />,
       title: "Facturación Inteligente",
     },
     {
-      icon: <BarChart className="w-6 h-6 text-[#BF3131]" />,
+      icon: <BarChart className="w-6 h-6 text-[#308E70]" />,
       title: "Entrenamiento Cognitivo",
     },
   ]
 
   return (
-    <section ref={ref} className="py-20 bg-[#141414] relative overflow-hidden">
+    <section ref={ref} className="py-20 mx-auto max-w-7xl relative overflow-hidden">
       <div className="container mx-auto px-4 z-10 relative">
         <div className="text-center mb-12">
-          <h2 className="apps-title text-3xl md:text-4xl font-bold text-[#BF3131] mb-4">
+          <h2 className="apps-title text-3xl md:text-4xl font-bold text-[#308E70] mb-4">
             Descubra las Aplicaciones de Atención Médica
             <br />
             <span className="text-[#FFFAFA]">FWAE AI de MedML</span>
@@ -120,7 +120,7 @@ export default function ApplicationsSection() {
                 }`}
                 onClick={() => setActiveSlide(index)}
               >
-                <div className={`p-4 rounded-full ${activeSlide === index ? "bg-[#BF3131]/30" : "bg-[#FFFAFA]/5"}`}>
+                <div className={`p-4 rounded-full ${activeSlide === index ? "bg-[#308E70]/30" : "bg-[#FFFAFA]/5"}`}>
                   {app.icon}
                 </div>
                 <p className={`mt-2 text-sm ${activeSlide === index ? "text-[#FFFAFA]" : "text-[#FFFAFA]/60"}`}>
@@ -137,7 +137,7 @@ export default function ApplicationsSection() {
               <button
                 key={i}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  activeSlide === i ? "bg-[#BF3131] w-6" : "bg-[#FFFAFA]/30"
+                  activeSlide === i ? "bg-[#308E70] w-6" : "bg-[#FFFAFA]/30"
                 }`}
                 onClick={() => setActiveSlide(i)}
               />
@@ -146,7 +146,7 @@ export default function ApplicationsSection() {
         </div>
 
         {/* Stats section with red background */}
-        <div className="stats-section mt-20 bg-[#BF3131] rounded-lg overflow-hidden">
+        <div className="stats-section mt-20 bg-[#308E70] rounded-lg overflow-hidden">
           <div className="p-8 md:p-12">
             <h3 className="text-2xl md:text-3xl font-bold text-[#FFFAFA] text-center mb-4">
               Este es el rendimiento que podemos darte en MedML

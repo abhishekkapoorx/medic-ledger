@@ -3,6 +3,8 @@ import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/providers/theme-provider";
+import Header from "@/components/header"
+import Footer from "@/components/footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${robotoMono.variable} antialiased`}
       >
+      <Header />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -41,6 +44,7 @@ export default function RootLayout({
 
         </ThemeProvider>
       </body>
+      <Footer />
     </html>
   );
 }

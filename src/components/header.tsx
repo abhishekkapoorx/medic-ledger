@@ -69,24 +69,24 @@ export default function Header() {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link href="/" className="header-logo flex items-center">
           <div className="flex items-center">
-            <span className="text-[#BF3131] font-bold text-2xl">Med</span>
+            <span className="text-[#308E70] font-bold text-2xl">Med</span>
             <span className="text-[#FFFAFA] font-bold text-2xl">ML</span>
           </div>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="#nosotros" className="nav-item text-[#FFFAFA] hover:text-[#BF3131] transition-colors">
+          <Link href="#nosotros" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
             Nosotros
           </Link>
-          <Link href="#deseo-invertir" className="nav-item text-[#FFFAFA] hover:text-[#BF3131] transition-colors">
+          <Link href="#deseo-invertir" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
             Deseo Invertir
           </Link>
-          <Link href="#contactanos" className="nav-item text-[#FFFAFA] hover:text-[#BF3131] transition-colors">
+          <Link href="#contactanos" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
             Contáctanos
           </Link>
           <Link
             href="#demo"
-            className="cta-button bg-[#BF3131] text-[#FFFAFA] px-6 py-2 rounded-md hover:bg-[#BF3131]/80 transition-all transform hover:scale-105"
+            className="cta-button bg-[#308E70] text-[#FFFAFA] px-6 py-2 rounded-md hover:bg-[#308E70]/80 transition-all transform hover:scale-105"
           >
             Solicitar Demo Gratis
           </Link>

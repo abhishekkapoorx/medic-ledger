@@ -70,19 +70,18 @@ export default function AboutSection() {
   }, [inView])
 
   return (
-    <section ref={ref} id="nosotros" className="py-20 bg-[#141414] relative overflow-hidden">
+    <section ref={ref} id="nosotros" className="py-20  max-w-7xl mx-auto relative overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-l from-[#BF3131]/20 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-t from-[#BF3131]/10 to-transparent"></div>
-      </div>
+      {/* <div className="absolute inset-0">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-l from-[#308E70]/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-t from-[#308E70]/10 to-transparent"></div>
+      </div> */}
 
       <div className="container mx-auto px-4 z-10 relative">
         <div className="text-center mb-12">
-          <h2 className="about-title text-3xl md:text-4xl font-bold text-[#BF3131] mb-4">¿Quiénes somos?</h2>
-          <p className="about-description text-[#FFFAFA]/80 max-w-3xl mx-auto">
-            Somos una plataforma de automatización que ofrece aplicaciones de atención médica de IA, potenciadas por
-            capacidades avanzadas de aprendizaje de alto nivel creativas.
+          <h2 className="about-title text-3xl md:text-4xl font-bold text-[#308E70] mb-4">Our Vision, Our Mission</h2>
+          <p className="about-description text-[#FFFAFA]/80 max-w-5xl mx-auto text-justify">
+          Our vision is to create a decentralized, transparent pharmaceutical ecosystem that ensures the authenticity of medicines and facilitates secure transactions. By leveraging blockchain, NFTs, and smart contracts, our mission is to empower healthcare providers, patients, and stakeholders with a seamless, trustworthy platform for accessing, prescribing, and donating life-saving medications.
           </p>
         </div>
 
@@ -96,7 +95,7 @@ export default function AboutSection() {
               {Array.from({ length: 100 }).map((_, i) => (
                 <div
                   key={i}
-                  className="map-dot absolute w-1 h-1 rounded-full bg-[#BF3131]"
+                  className="map-dot absolute w-1 h-1 rounded-full bg-[#308E70]"
                   style={{
                     top: `${10 + Math.random() * 80}%`,
                     left: `${10 + Math.random() * 80}%`,
@@ -115,11 +114,11 @@ export default function AboutSection() {
               ].map((pos, i) => (
                 <div
                   key={`major-${i}`}
-                  className="map-dot absolute w-2 h-2 rounded-full bg-[#BF3131]"
+                  className="map-dot absolute w-2 h-2 rounded-full bg-[#308E70]"
                   style={{
                     top: pos.top,
                     left: pos.left,
-                    boxShadow: "0 0 8px #BF3131",
+                    boxShadow: "0 0 8px #308E70",
                   }}
                 ></div>
               ))}
@@ -129,40 +128,40 @@ export default function AboutSection() {
           </div>
 
           <div className="w-full md:w-2/5">
-            <h3 className="values-title text-2xl font-bold text-[#FFFAFA] mb-8">Nuestros Valores:</h3>
+            <h3 className="values-title text-2xl font-bold text-[#FFFAFA] mb-8">Key Insights:</h3>
             <ul className="space-y-6">
               <li className="value-item flex items-start gap-4">
-                <div className="mt-1 bg-[#BF3131]/20 p-2 rounded-full">
-                  <Lightbulb className="w-5 h-5 text-[#BF3131]" />
+                <div className="mt-1 bg-[#308E70]/20 p-2 rounded-full">
+                  <Lightbulb className="w-5 h-5 text-[#308E70]" />
                 </div>
                 <div>
-                  <h4 className="text-[#FFFAFA] font-semibold text-lg">Innovación</h4>
+                  <h4 className="text-[#FFFAFA] font-semibold text-lg">Authentic Medicine Guarantee</h4>
                   <p className="text-[#FFFAFA]/70 text-sm">
-                    Constantemente buscamos nuevas formas de mejorar nuestras soluciones.
+                  Using blockchain and NFTs, we ensure every medicine is verifiable and free from counterfeiting.
                   </p>
                 </div>
               </li>
 
               <li className="value-item flex items-start gap-4">
-                <div className="mt-1 bg-[#BF3131]/20 p-2 rounded-full">
-                  <Accessibility className="w-5 h-5 text-[#BF3131]" />
+                <div className="mt-1 bg-[#308E70]/20 p-2 rounded-full">
+                  <Accessibility className="w-5 h-5 text-[#308E70]" />
                 </div>
                 <div>
-                  <h4 className="text-[#FFFAFA] font-semibold text-lg">Accesibilidad</h4>
+                  <h4 className="text-[#FFFAFA] font-semibold text-lg">Secure, Smart Prescriptions</h4>
                   <p className="text-[#FFFAFA]/70 text-sm">
-                    Creamos tecnología que sea accesible para todos los profesionales médicos.
+                  Doctors issue tamper-proof prescriptions via smart contracts, streamlining medicine distribution.
                   </p>
                 </div>
               </li>
 
               <li className="value-item flex items-start gap-4">
-                <div className="mt-1 bg-[#BF3131]/20 p-2 rounded-full">
-                  <Users className="w-5 h-5 text-[#BF3131]" />
+                <div className="mt-1 bg-[#308E70]/20 p-2 rounded-full">
+                  <Users className="w-5 h-5 text-[#308E70]" />
                 </div>
                 <div>
-                  <h4 className="text-[#FFFAFA] font-semibold text-lg">Colaboración</h4>
+                  <h4 className="text-[#FFFAFA] font-semibold text-lg">Equal Access via Marketplace</h4>
                   <p className="text-[#FFFAFA]/70 text-sm">
-                    Trabajamos juntos con profesionales de la salud para crear soluciones efectivas.
+                  A decentralized platform enables fair access to donated and purchased medicines for all.
                   </p>
                 </div>
               </li>

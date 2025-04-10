@@ -78,13 +78,13 @@ export default function TransformationSection() {
     <section ref={ref} className="py-20 bg-[#141414] relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-l from-[#BF3131]/20 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-t from-[#BF3131]/10 to-transparent"></div>
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-l from-[#308E70]/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-t from-[#308E70]/10 to-transparent"></div>
       </div>
 
       <div className="container mx-auto px-4 z-10 relative">
         <div className="text-center mb-12">
-          <h2 className="transform-title text-3xl md:text-4xl font-bold text-[#BF3131] mb-4">
+          <h2 className="transform-title text-3xl md:text-4xl font-bold text-[#308E70] mb-4">
             Revoluciona tu Proceso con Capas de Transformación
           </h2>
           <p className="transform-subtitle text-[#FFFAFA]/80">
@@ -94,10 +94,10 @@ export default function TransformationSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="layer-card bg-[#141414] border border-[#FFFAFA]/10 rounded-lg p-6 transition-all">
-            <div className="bg-[#BF3131]/20 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-              <Layers className="w-6 h-6 text-[#BF3131]" />
+            <div className="bg-[#308E70]/20 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+              <Layers className="w-6 h-6 text-[#308E70]" />
             </div>
-            <h3 className="text-[#BF3131] font-bold text-lg mb-3">Capa de Tecnología Profunda</h3>
+            <h3 className="text-[#308E70] font-bold text-lg mb-3">Capa de Tecnología Profunda</h3>
             <p className="text-[#FFFAFA]/70">
               Inteligencia transformadora que aprovecha los últimos avances en aprendizaje profundo para proporcionar
               una comprensión sin precedentes de los datos médicos complejos.
@@ -105,10 +105,10 @@ export default function TransformationSection() {
           </div>
 
           <div className="layer-card bg-[#141414] border border-[#FFFAFA]/10 rounded-lg p-6 transition-all">
-            <div className="bg-[#BF3131]/20 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-              <GitBranch className="w-6 h-6 text-[#BF3131]" />
+            <div className="bg-[#308E70]/20 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+              <GitBranch className="w-6 h-6 text-[#308E70]" />
             </div>
-            <h3 className="text-[#BF3131] font-bold text-lg mb-3">Capa de Automatización del Flujo de Trabajo</h3>
+            <h3 className="text-[#308E70] font-bold text-lg mb-3">Capa de Automatización del Flujo de Trabajo</h3>
             <p className="text-[#FFFAFA]/70">
               Sistemas avanzados que automatizan procesos, integran sistemas existentes y mejoran la eficiencia
               operativa.
@@ -116,10 +116,10 @@ export default function TransformationSection() {
           </div>
 
           <div className="layer-card bg-[#141414] border border-[#FFFAFA]/10 rounded-lg p-6 transition-all">
-            <div className="bg-[#BF3131]/20 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-              <MessageSquare className="w-6 h-6 text-[#BF3131]" />
+            <div className="bg-[#308E70]/20 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+              <MessageSquare className="w-6 h-6 text-[#308E70]" />
             </div>
-            <h3 className="text-[#BF3131] font-bold text-lg mb-3">Capa de Comunicación Digital</h3>
+            <h3 className="text-[#308E70] font-bold text-lg mb-3">Capa de Comunicación Digital</h3>
             <p className="text-[#FFFAFA]/70">
               Mejora la comunicación entre pacientes y proveedores con herramientas digitales que simplifican tus
               procesos y feedback del paciente.
@@ -128,7 +128,7 @@ export default function TransformationSection() {
         </div>
 
         {/* CTA Section with red background */}
-        <div className="cta-section mt-20 bg-[#BF3131] rounded-lg overflow-hidden">
+        <div className="cta-section mt-20 bg-[#308E70] rounded-lg overflow-hidden">
           <div className="p-8 md:p-12 text-center">
             <h3 className="text-2xl md:text-3xl font-bold text-[#FFFAFA] mb-4">
               ¿Listo para posicionarte en la cresta de la ola?
@@ -139,7 +139,7 @@ export default function TransformationSection() {
             </p>
             <Link
               href="#demo"
-              className="inline-block bg-[#FFFAFA] text-[#BF3131] px-6 py-3 rounded-md hover:bg-[#FFFAFA]/90 transition-all transform hover:scale-105 font-medium"
+              className="inline-block bg-[#FFFAFA] text-[#308E70] px-6 py-3 rounded-md hover:bg-[#FFFAFA]/90 transition-all transform hover:scale-105 font-medium"
             >
               Solicitar Demo Gratis
             </Link>

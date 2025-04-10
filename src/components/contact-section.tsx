@@ -67,7 +67,7 @@ export default function ContactSection() {
           gsap.to(element, {
             y: -5,
             scale: 1.2,
-            color: "#BF3131",
+            color: "#308E70",
             duration: 0.3,
           })
         })
@@ -108,14 +108,14 @@ export default function ContactSection() {
     <section ref={ref} id="contactanos" className="py-20 bg-[#141414] relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-l from-[#BF3131]/20 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-t from-[#BF3131]/10 to-transparent"></div>
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-l from-[#308E70]/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-t from-[#308E70]/10 to-transparent"></div>
       </div>
 
       <div className="container mx-auto px-4 z-10 relative">
         <div className="flex flex-col md:flex-row gap-12">
           <div className="w-full md:w-1/3">
-            <h2 className="contact-title text-3xl md:text-4xl font-bold text-[#BF3131] mb-6">Contáctanos</h2>
+            <h2 className="contact-title text-3xl md:text-4xl font-bold text-[#308E70] mb-6">Contáctanos</h2>
 
             <div className="contact-info space-y-6">
               <p className="text-[#FFFAFA]/80">
@@ -131,13 +131,13 @@ export default function ContactSection() {
               <div>
                 <h3 className="text-[#FFFAFA] font-bold mb-2">Redes Sociales</h3>
                 <div className="flex space-x-4">
-                  <a href="#" className="social-icon text-[#FFFAFA] hover:text-[#BF3131] transition-colors">
+                  <a href="#" className="social-icon text-[#FFFAFA] hover:text-[#308E70] transition-colors">
                     <Instagram className="w-5 h-5" />
                   </a>
-                  <a href="#" className="social-icon text-[#FFFAFA] hover:text-[#BF3131] transition-colors">
+                  <a href="#" className="social-icon text-[#FFFAFA] hover:text-[#308E70] transition-colors">
                     <Twitter className="w-5 h-5" />
                   </a>
-                  <a href="#" className="social-icon text-[#FFFAFA] hover:text-[#BF3131] transition-colors">
+                  <a href="#" className="social-icon text-[#FFFAFA] hover:text-[#308E70] transition-colors">
                     <Facebook className="w-5 h-5" />
                   </a>
                 </div>
@@ -157,7 +157,7 @@ export default function ContactSection() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#BF3131] focus:outline-none transition-colors"
+                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#308E70] focus:outline-none transition-colors"
                   required
                 />
               </div>
@@ -172,7 +172,7 @@ export default function ContactSection() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#BF3131] focus:outline-none transition-colors"
+                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#308E70] focus:outline-none transition-colors"
                   required
                 />
               </div>
@@ -186,7 +186,7 @@ export default function ContactSection() {
                   name="purpose"
                   value={formData.purpose}
                   onChange={handleChange}
-                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#BF3131] focus:outline-none transition-colors"
+                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#308E70] focus:outline-none transition-colors"
                   required
                 >
                   <option value="">Selecciona una opción</option>
@@ -207,7 +207,7 @@ export default function ContactSection() {
                   name="region"
                   value={formData.region}
                   onChange={handleChange}
-                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#BF3131] focus:outline-none transition-colors"
+                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#308E70] focus:outline-none transition-colors"
                   required
                 >
                   <option value="">Selecciona tu región</option>
@@ -230,7 +230,7 @@ export default function ContactSection() {
                   value={formData.message}
                   onChange={handleChange}
                   rows={5}
-                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#BF3131] focus:outline-none transition-colors resize-none"
+                  className="w-full bg-[#141414] border border-[#FFFAFA]/20 rounded-md px-4 py-2 text-[#FFFAFA] focus:border-[#308E70] focus:outline-none transition-colors resize-none"
                   required
                 ></textarea>
               </div>
@@ -238,7 +238,7 @@ export default function ContactSection() {
               <div className="form-element text-right">
                 <button
                   type="submit"
-                  className="submit-button bg-[#BF3131] text-[#FFFAFA] px-6 py-3 rounded-md hover:bg-[#BF3131]/80 transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                  className="submit-button bg-[#308E70] text-[#FFFAFA] px-6 py-3 rounded-md hover:bg-[#308E70]/80 transition-all transform hover:scale-105 flex items-center justify-center gap-2"
                 >
                   Enviar
                   <Send className="w-4 h-4" />

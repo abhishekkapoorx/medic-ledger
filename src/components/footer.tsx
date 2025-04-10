@@ -59,7 +59,7 @@ export default function Footer() {
   }, [inView])
 
   return (
-    <footer ref={ref} className="bg-[#BF3131] py-12 relative overflow-hidden">
+    <footer ref={ref} className="bg-[#308E70] py-12 relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0">
         <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-l from-[#141414]/20 to-transparent"></div>
