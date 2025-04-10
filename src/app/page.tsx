@@ -11,6 +11,7 @@ import TestimonialsSection from "@/components/testimonal"
 import ContactSection from "@/components/contact-section"
 import Footer from "@/components/footer"
 import { useRef } from "react"
+import gsap from "gsap"
 
 export default function Home() {
     const circleRef = useRef(null)
@@ -34,7 +35,7 @@ export default function Home() {
       {/* <div className="absolute -bottom-16 left-0 w-[600px] rounded-full h-[600px] bg-radial from-[#CC5A5A]/15 to-transparent"></div> */}
       <div
               ref={circleRef}
-              className="absolute top-[400px] -right-[1100px] transform -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] md:w-[350px] md:h-[350px]  lg:w-[500px] lg:h-[500px] rounded-full bg-gradient-to-r from-[#308E70]/20 to-[#308E70]/10 blur-xl"
+              className="absolute top-[400px] -right-[500px] transform -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] md:w-[350px] md:h-[350px]  lg:w-[500px] lg:h-[500px] rounded-full bg-gradient-to-r from-[#308E70]/20 to-[#308E70]/10 blur-xl"
             ></div>
       <div
               ref={circleRef}
@@ -48,18 +49,18 @@ export default function Home() {
       {/* <div className="absolute -bottom-16 left-0 w-[600px] rounded-full h-[600px] bg-radial from-[#CC5A5A]/15 to-transparent"></div> */}
       <div
               ref={circleRef}
-              className="absolute top-[400px] -right-[450px] transform -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] md:w-[350px] md:h-[350px]  lg:w-[500px] lg:h-[500px] rounded-full bg-gradient-to-r from-[#308E70]/20 to-[#308E70]/10 blur-xl"
+              className="absolute top-[1400px] -right-[450px] transform -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] md:w-[350px] md:h-[350px]  lg:w-[500px] lg:h-[500px] rounded-full bg-gradient-to-r from-[#308E70]/20 to-[#308E70]/10 blur-xl"
             ></div>
       
     </div>
     <TestimonialsSection />
       <FeaturesSection />
-      <WhyAISection />
+      {/* <WhyAISection />
       <ApplicationsSection />
       <GenieSection />
       <TransformationSection />
      
-      <ContactSection />
+      <ContactSection /> */}
       
     </main>
   )

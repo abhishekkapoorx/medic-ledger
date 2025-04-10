@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import gsap from "gsap"
 import Link from "next/link"
+import  Spline  from "@splinetool/react-spline"
 
 export default function HeroSection() {
   const { ref, inView } = useInView({
@@ -120,7 +121,10 @@ export default function HeroSection() {
           {/* Head silhouette with digital elements */}
           <div ref={headRef} className="relative mx-auto w-[300px] h-[400px] md:w-[400px] md:h-[500px]">
             {/* Glowing circle behind the head */}
-            
+            {/* <Spline
+         scene="https://prod.spline.design/FJDPOlQagsje2F93/scene.splinecode" 
+        style={{ width: "200px", height: "200px" }}
+      /> */}
 
             {/* Head silhouette */}
             {/* <div className="absolute inset-0 bg-[url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Mee2kMBCERKpDoLf6BNwh9eTtKBlo8.png')] bg-contain bg-center bg-no-repeat"></div> */}
