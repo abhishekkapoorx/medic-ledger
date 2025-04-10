@@ -60,7 +60,7 @@ export default function Home() {
       <GenieSection />
       <TransformationSection />
 
-      <ContactSection />
+      <ContactSection /> */}
 
     </main>
   )
