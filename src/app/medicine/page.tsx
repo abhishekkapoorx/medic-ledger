@@ -60,7 +60,7 @@ export default function MedicineHome() {
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8 text-center">Medicine Tracking System</h1>
       
-      {showAllTabs && (
+      {!showAllTabs && (
         <div className="flex gap-4 mb-8 justify-center">
           <Button 
             onClick={() => setDefaultTab("manufacturer")} 

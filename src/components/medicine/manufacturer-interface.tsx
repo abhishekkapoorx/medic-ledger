@@ -9,8 +9,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { format } from "date-fns"
-import { CalendarIcon, Upload, Loader2 } from "lucide-react"
+import { CalendarIcon, Upload, Loader2, DollarSign, Tag, Check, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ethers } from "ethers"
 import toast from "react-hot-toast"
@@ -18,9 +26,11 @@ import axios from "axios"
 
 // Import contract ABIs
 import MedicineTokenizerArtifact from "../../../sol_back/artifacts/contracts/MedicineNFT.sol/MedicineTokenizer.json"
+import PharmacyMarketplaceArtifact from "../../../sol_back/artifacts/contracts/MarketPlace.sol/PharmacyMarketplace.json"
 
 // Environment variables for contract addresses
 const MEDICINE_NFT_ADDRESS = process.env.NEXT_PUBLIC_MEDICINE_NFT_ADDRESS || "0x43ca3D2C94be00692D207C6A1e60D8B325c6f12f";
+const MARKETPLACE_ADDRESS = process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
 
 // Pinata API keys from environment variables
 const PINATA_API_KEY = process.env.NEXT_PUBLIC_PINATA_API_KEY || "970dfd5439f35fced039";
@@ -39,6 +49,8 @@ interface Medicine {
   ipfsHash: string;
   manufacturer: string;
   currentOwner: string;
+  isListed?: boolean;
+  listingPrice?: string;
 }
 
 export default function ManufacturerInterface() {
@@ -54,10 +66,17 @@ export default function ManufacturerInterface() {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
+  // New state variables for listing functionality
+  const [selectedMedicine, setSelectedMedicine] = useState<string | null>(null);
+  const [listingPrice, setListingPrice] = useState("");
+  const [isListing, setIsListing] = useState(false);
+  const [activeTab, setActiveTab] = useState("mint"); // 'mint' or 'sell'
+  
   // Blockchain connection states
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
-  const [contract, setContract] = useState<ethers.Contract | null>(null);
+  const [medicineContract, setMedicineContract] = useState<ethers.Contract | null>(null);
+  const [marketplaceContract, setMarketplaceContract] = useState<ethers.Contract | null>(null);
   const [connectedAccount, setConnectedAccount] = useState<string>("");
   const [isConnected, setIsConnected] = useState(false);
 
@@ -88,10 +107,10 @@ export default function ManufacturerInterface() {
 
   // Load minted medicines when connected
   useEffect(() => {
-    if (isConnected && contract && connectedAccount) {
+    if (isConnected && medicineContract && connectedAccount) {
       fetchMintedMedicines();
     }
-  }, [isConnected, contract, connectedAccount]);
+  }, [isConnected, medicineContract, connectedAccount]);
 
   // Connect wallet function
   const handleConnect = async () => {
@@ -108,13 +127,21 @@ export default function ManufacturerInterface() {
       setConnectedAccount(accounts[0]);
       setIsConnected(true);
 
-      // Initialize contract
-      const _contract = new ethers.Contract(
+      // Initialize medicine contract
+      const _medicineContract = new ethers.Contract(
         MEDICINE_NFT_ADDRESS,
         MedicineTokenizerArtifact.abi,
         _signer
       );
-      setContract(_contract);
+      setMedicineContract(_medicineContract);
+      
+      // Initialize marketplace contract
+      const _marketplaceContract = new ethers.Contract(
+        MARKETPLACE_ADDRESS,
+        PharmacyMarketplaceArtifact.abi,
+        _signer
+      );
+      setMarketplaceContract(_marketplaceContract);
 
       toast.success("Wallet connected successfully!");
 
@@ -126,7 +153,7 @@ export default function ManufacturerInterface() {
 
   // Fetch medicines minted by the connected manufacturer
   const fetchMintedMedicines = async () => {
-    if (!contract || !connectedAccount) return;
+    if (!medicineContract || !connectedAccount) return;
 
     setIsLoadingMedicines(true);
     try {
@@ -136,7 +163,7 @@ export default function ManufacturerInterface() {
       // In a real implementation, you would query events or create a specialized view function
       // For this example, we'll simulate by checking the next token ID and iterating backwards
       
-      const nextTokenId = await contract.getNextTokenId?.() || 0;
+      const nextTokenId = await medicineContract.getNextTokenId?.() || 0;
       const medicines: Medicine[] = [];
       
       // Check the last 20 tokens (limit the loop for performance)
@@ -145,10 +172,10 @@ export default function ManufacturerInterface() {
       for (let i = startId; i < Number(nextTokenId); i++) {
         try {
           // Check if the token exists and belongs to the current user
-          const owner = await contract.ownerOf(i);
+          const owner = await medicineContract.ownerOf(i);
           
           if (owner.toLowerCase() === connectedAccount.toLowerCase()) {
-            const details = await contract.getMedicineDetails(i);
+            const details = await medicineContract.getMedicineDetails(i);
             
             // Format the medicine data
             const medicine: Medicine = {
@@ -162,7 +189,21 @@ export default function ManufacturerInterface() {
               ipfsHash: details.ipfsHash,
               manufacturer: details.manufacturer,
               currentOwner: details.currentOwner,
+              isListed: false
             };
+            
+            // Check if this medicine is already listed in the marketplace
+            if (marketplaceContract) {
+              try {
+                const listing = await marketplaceContract.listings(i);
+                if (listing && listing.isActive) {
+                  medicine.isListed = true;
+                  medicine.listingPrice = ethers.formatEther(listing.price);
+                }
+              } catch (err) {
+                // Token might not be listed - continue
+              }
+            }
             
             medicines.push(medicine);
           }
@@ -242,7 +283,7 @@ export default function ManufacturerInterface() {
   // Mint medicine NFT
   const handleMint = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contract || !signer || !expiryDate) {
+    if (!medicineContract || !signer || !expiryDate) {
       toast.error("Please connect wallet and fill all fields");
       return;
     }
@@ -259,7 +300,7 @@ export default function ManufacturerInterface() {
       const expiryTimestamp = Math.floor(expiryDate.getTime() / 1000);
 
       // Call the contract
-      const tx = await contract.mintMedicine(
+      const tx = await medicineContract.mintMedicine(
         name,
         batchNumber,
         expiryTimestamp,
@@ -281,7 +322,7 @@ export default function ManufacturerInterface() {
       if (receipt && receipt.logs) {
         for (const log of receipt.logs) {
           try {
-            const parsedLog = contract.interface.parseLog({
+            const parsedLog = medicineContract.interface.parseLog({
               topics: log.topics as string[],
               data: log.data
             });
@@ -321,6 +362,87 @@ export default function ManufacturerInterface() {
     }
   };
 
+  // List medicine in marketplace for distributors
+  const handleListMedicine = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!marketplaceContract || !signer || !selectedMedicine) {
+      toast.error("Please connect wallet and select a medicine");
+      return;
+    }
+    
+    // Validate price
+    if (!listingPrice || parseFloat(listingPrice) <= 0) {
+      toast.error("Please enter a valid price");
+      return;
+    }
+    
+    setIsListing(true);
+    try {
+      // Convert price to wei
+      const priceInWei = ethers.parseEther(listingPrice);
+      const tokenId = selectedMedicine;
+      
+      // Check if medicine contract is approved for marketplace
+      const isApproved = await medicineContract!.isApprovedForAll(
+        connectedAccount,
+        MARKETPLACE_ADDRESS
+      );
+      
+      // If not approved, request approval first
+      if (!isApproved) {
+        toast.loading("Approving marketplace to transfer medicines...");
+        const approveTx = await medicineContract!.setApprovalForAll(
+          MARKETPLACE_ADDRESS,
+          true
+        );
+        await approveTx.wait();
+        toast.dismiss();
+        toast.success("Marketplace approved successfully!");
+      }
+      
+      // List the medicine
+      toast.loading("Listing medicine on marketplace...");
+      const tx = await marketplaceContract.listMedicine(tokenId, priceInWei);
+      await tx.wait();
+      toast.dismiss();
+      
+      toast.success(`Medicine #${tokenId} listed for ${listingPrice} ETH`);
+      
+      // Reset form and refresh medicines
+      setSelectedMedicine(null);
+      setListingPrice("");
+      fetchMintedMedicines();
+      
+    } catch (error: any) {
+      console.error("Listing failed:", error);
+      toast.error(error.reason || error.message || "Transaction failed");
+    } finally {
+      setIsListing(false);
+    }
+  };
+
+  // Cancel medicine listing
+  const handleCancelListing = async (tokenId: string) => {
+    if (!marketplaceContract) return;
+    
+    try {
+      toast.loading("Cancelling listing...");
+      const tx = await marketplaceContract.cancelListing(tokenId);
+      await tx.wait();
+      toast.dismiss();
+      
+      toast.success(`Listing for medicine #${tokenId} cancelled`);
+      
+      // Refresh medicines list
+      fetchMintedMedicines();
+      
+    } catch (error: any) {
+      console.error("Cancel listing failed:", error);
+      toast.error(error.reason || error.message || "Transaction failed");
+    }
+  };
+
   // Format address for display
   const formatAddress = (address: string) => {
     if (!address) return "";
@@ -344,197 +466,363 @@ export default function ManufacturerInterface() {
             <span className="font-medium">Connected Account: </span>
             <span className="text-sm bg-neutral-100 dark:bg-neutral-800 p-2 rounded">{formatAddress(connectedAccount)}</span>
           </div>
-          <Button onClick={fetchMintedMedicines} variant="outline" disabled={isLoadingMedicines}>
-            {isLoadingMedicines ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading...
-              </>
-            ) : (
-              'Refresh'
-            )}
-          </Button>
+          <div className="space-x-2">
+            <Button onClick={fetchMintedMedicines} variant="outline" disabled={isLoadingMedicines}>
+              {isLoadingMedicines ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                'Refresh'
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+      
+      {isConnected && (
+        <div className="mb-6">
+          <div className="flex space-x-2 mb-4">
+            <Button 
+              onClick={() => setActiveTab("mint")} 
+              variant={activeTab === "mint" ? "default" : "outline"}
+            >
+              Mint Medicines
+            </Button>
+            <Button 
+              onClick={() => setActiveTab("sell")} 
+              variant={activeTab === "sell" ? "default" : "outline"}
+            >
+              Sell to Distributors
+            </Button>
+          </div>
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Mint New Medicine</CardTitle>
-            <CardDescription>Create a new medicine NFT on the blockchain</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleMint} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="medicineName">Medicine Name</Label>
-                <Input
-                  id="medicineName"
-                  placeholder="Enter medicine name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={!isConnected || isMinting}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="batchNumber">Batch Number</Label>
-                <Input
-                  id="batchNumber"
-                  placeholder="Enter batch number"
-                  value={batchNumber}
-                  onChange={(e) => setBatchNumber(e.target.value)}
-                  disabled={!isConnected || isMinting}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="expiryDate">Expiry Date</Label>
-                <Input
-                  id="expiryDate"
-                  type="date"
-                  className="w-full"
-                  value={expiryDate ? expiryDate.toISOString().split('T')[0] : ''}
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      const selectedDate = new Date(e.target.value);
-                      setExpiryDate(selectedDate);
-                    } else {
-                      setExpiryDate(undefined);
-                    }
-                  }}
-                  min={new Date().toISOString().split('T')[0]} // Set min to today's date
-                  disabled={!isConnected || isMinting}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="composition">Composition</Label>
-                <Textarea
-                  id="composition"
-                  placeholder="Enter medicine composition"
-                  value={composition}
-                  onChange={(e) => setComposition(e.target.value)}
-                  disabled={!isConnected || isMinting}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="storageConditions">Storage Conditions</Label>
-                <Input
-                  id="storageConditions"
-                  placeholder="E.g., Store below 25°C"
-                  value={storageConditions}
-                  onChange={(e) => setStorageConditions(e.target.value)}
-                  disabled={!isConnected || isMinting}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ipfsDocument">Document Upload</Label>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id="ipfsDocument"
-                      type="file"
-                      onChange={handleFileChange}
-                      disabled={!isConnected || isUploading || isMinting}
-                    />
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="outline"
-                      onClick={uploadToIPFS}
-                      disabled={!selectedFile || isUploading || !isConnected || isMinting}
-                    >
-                      {isUploading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Uploading
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Upload
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  {ipfsHash && (
-                    <div className="text-sm bg-neutral-100 dark:bg-neutral-800 p-2 rounded overflow-hidden">
-                      <span className="font-semibold">IPFS Hash:</span> {ipfsHash}
-                    </div>
-                  )}
+      {isConnected && activeTab === "mint" && (
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Mint New Medicine</CardTitle>
+              <CardDescription>Create a new medicine NFT on the blockchain</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleMint} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="medicineName">Medicine Name</Label>
+                  <Input
+                    id="medicineName"
+                    placeholder="Enter medicine name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    disabled={!isConnected || isMinting}
+                  />
                 </div>
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={!isConnected || isMinting || !ipfsHash || !expiryDate}
-              >
-                {isMinting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Minting...
-                  </>
-                ) : (
-                  'Mint Medicine NFT'
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Minted Medicines</CardTitle>
-            <CardDescription>View all medicines you have created</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingMedicines ? (
-              <div className="flex justify-center items-center h-48">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : mintedMedicines.length > 0 ? (
-              <div className="max-h-[500px] overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Batch</TableHead>
-                      <TableHead>Expiry</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mintedMedicines.map((medicine) => (
-                      <TableRow key={medicine.tokenId}>
-                        <TableCell className="font-medium">{medicine.tokenId}</TableCell>
-                        <TableCell>{medicine.name}</TableCell>
-                        <TableCell>{medicine.batchNumber}</TableCell>
-                        <TableCell>{format(medicine.expiryDate, "MMM d, yyyy")}</TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => window.open(`https://gateway.pinata.cloud/ipfs/${medicine.ipfsHash}`, '_blank')}
-                          >
-                            View
-                          </Button>
-                        </TableCell>
+                <div className="space-y-2">
+                  <Label htmlFor="batchNumber">Batch Number</Label>
+                  <Input
+                    id="batchNumber"
+                    placeholder="Enter batch number"
+                    value={batchNumber}
+                    onChange={(e) => setBatchNumber(e.target.value)}
+                    disabled={!isConnected || isMinting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="expiryDate">Expiry Date</Label>
+                  <Input
+                    id="expiryDate"
+                    type="date"
+                    className="w-full"
+                    value={expiryDate ? expiryDate.toISOString().split('T')[0] : ''}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        const selectedDate = new Date(e.target.value);
+                        setExpiryDate(selectedDate);
+                      } else {
+                        setExpiryDate(undefined);
+                      }
+                    }}
+                    min={new Date().toISOString().split('T')[0]} // Set min to today's date
+                    disabled={!isConnected || isMinting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="composition">Composition</Label>
+                  <Textarea
+                    id="composition"
+                    placeholder="Enter medicine composition"
+                    value={composition}
+                    onChange={(e) => setComposition(e.target.value)}
+                    disabled={!isConnected || isMinting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="storageConditions">Storage Conditions</Label>
+                  <Input
+                    id="storageConditions"
+                    placeholder="E.g., Store below 25°C"
+                    value={storageConditions}
+                    onChange={(e) => setStorageConditions(e.target.value)}
+                    disabled={!isConnected || isMinting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ipfsDocument">Document Upload</Label>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        id="ipfsDocument"
+                        type="file"
+                        onChange={handleFileChange}
+                        disabled={!isConnected || isUploading || isMinting}
+                      />
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        variant="outline"
+                        onClick={uploadToIPFS}
+                        disabled={!selectedFile || isUploading || !isConnected || isMinting}
+                      >
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Uploading
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {ipfsHash && (
+                      <div className="text-sm bg-neutral-100 dark:bg-neutral-800 p-2 rounded overflow-hidden">
+                        <span className="font-semibold">IPFS Hash:</span> {ipfsHash}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={!isConnected || isMinting || !ipfsHash || !expiryDate}
+                >
+                  {isMinting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Minting...
+                    </>
+                  ) : (
+                    'Mint Medicine NFT'
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Minted Medicines</CardTitle>
+              <CardDescription>View all medicines you have created</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingMedicines ? (
+                <div className="flex justify-center items-center h-48">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : mintedMedicines.length > 0 ? (
+                <div className="max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Batch</TableHead>
+                        <TableHead>Expiry</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center p-8 border rounded-lg">
-                <p>No medicines found. Start by minting your first medicine NFT.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                    </TableHeader>
+                    <TableBody>
+                      {mintedMedicines.map((medicine) => (
+                        <TableRow key={medicine.tokenId}>
+                          <TableCell className="font-medium">{medicine.tokenId}</TableCell>
+                          <TableCell>{medicine.name}</TableCell>
+                          <TableCell>{medicine.batchNumber}</TableCell>
+                          <TableCell>{format(medicine.expiryDate, "MMM d, yyyy")}</TableCell>
+                          <TableCell className="text-right space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open(`https://gateway.pinata.cloud/ipfs/${medicine.ipfsHash}`, '_blank')}
+                            >
+                              View
+                            </Button>
+                            {!medicine.isListed && (
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedMedicine(medicine.tokenId);
+                                  setActiveTab("sell");
+                                }}
+                              >
+                                List
+                              </Button>
+                            )}
+                            {medicine.isListed && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleCancelListing(medicine.tokenId)}
+                              >
+                                Cancel Listing
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center p-8 border rounded-lg">
+                  <p>No medicines found. Start by minting your first medicine NFT.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      {isConnected && activeTab === "sell" && (
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>List Medicine for Distributors</CardTitle>
+              <CardDescription>Sell your medicines to distributors through the marketplace</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleListMedicine} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="medicineSelect">Select Medicine</Label>
+                  <Select
+                    value={selectedMedicine || ""}
+                    onValueChange={(value) => setSelectedMedicine(value)}
+                    disabled={isListing || mintedMedicines.length === 0}
+                  >
+                    <SelectTrigger className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                      <SelectValue placeholder="-- Select Medicine --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {mintedMedicines
+                          .filter(m => !m.isListed)
+                          .map((medicine) => (
+                            <SelectItem key={medicine.tokenId} value={medicine.tokenId}>
+                              ID: {medicine.tokenId} - {medicine.name} (Batch: {medicine.batchNumber})
+                            </SelectItem>
+                          ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="price">Price (ETH)</Label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.001"
+                      min="0.001"
+                      className="pl-10"
+                      placeholder="0.00"
+                      value={listingPrice}
+                      onChange={(e) => setListingPrice(e.target.value)}
+                      disabled={isListing}
+                    />
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={!selectedMedicine || !listingPrice || isListing}
+                >
+                  {isListing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Listing...
+                    </>
+                  ) : (
+                    'List for Sale'
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Listed Medicines</CardTitle>
+              <CardDescription>Manage your medicines listed for sale</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingMedicines ? (
+                <div className="flex justify-center items-center h-48">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : mintedMedicines.filter(m => m.isListed).length > 0 ? (
+                <div className="max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Price (ETH)</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {mintedMedicines
+                        .filter(m => m.isListed)
+                        .map((medicine) => (
+                          <TableRow key={medicine.tokenId}>
+                            <TableCell className="font-medium">{medicine.tokenId}</TableCell>
+                            <TableCell>{medicine.name}</TableCell>
+                            <TableCell>{medicine.listingPrice}</TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleCancelListing(medicine.tokenId)}
+                              >
+                                Cancel
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center p-8 border rounded-lg">
+                  <p>No medicines listed for sale. List your first medicine.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
