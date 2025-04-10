@@ -71,12 +71,12 @@ export default function Footer() {
           <div className="footer-logo mb-8 md:mb-0">
             <Link href="/" className="flex items-center">
               <div className="flex items-center">
-                <span className="text-[#FFFAFA] font-bold text-2xl">Med</span>
-                <span className="text-[#141414] font-bold text-2xl">ML</span>
+                <span className="text-[#FFFAFA] font-bold text-2xl">Medic</span>
+                <span className="text-[#141414] font-bold text-2xl">Ledger</span>
               </div>
             </Link>
-            <p className="text-[#FFFAFA]/80 text-sm mt-2">
-              MedML aplica la IA de decisión artificial para mejorar y expandir los seguros para los pacientes.
+            <p className="text-[#FFFAFA]/80 text-sm mt-2 text-justify">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde dolor sunt laborum blanditiis aperiam? Corrupti, distinctio nostrum! Dignissimos aliquid eius quaerat ad officiis beatae amet possimus cupiditate dolores culpa veniam blanditiis expedita, nihil ducimus.
             </p>
           </div>
 
@@ -86,24 +86,24 @@ export default function Footer() {
               <ul className="space-y-2">
                 <li className="footer-nav-item">
                   <Link href="#nosotros" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
-                    Nosotros
+                    Home
                   </Link>
                 </li>
                 <li className="footer-nav-item">
                   <Link href="#testimonios" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
-                    Casos de éxito
+                   About
                   </Link>
                 </li>
                 <li className="footer-nav-item">
                   <Link href="#demo" className="text-[#FFFAFA]/80 hover:text-[#FFFAFA] transition-colors">
-                    Demo
+                   marketplace
                   </Link>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-[#FFFAFA] font-bold mb-3">Suscríbete a nuestro Newsletter</h3>
+              <h3 className="text-[#FFFAFA] font-bold mb-3">Suscríbete to medic ledger</h3>
               <div className="newsletter-section flex mt-2">
                 <input
                   type="email"
@@ -120,7 +120,7 @@ export default function Footer() {
 
         <div className="border-t border-[#FFFAFA]/20 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-[#FFFAFA]/60 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} MedML. Todos los derechos reservados.
+            © {new Date().getFullYear()} Lorem, ipsum dolor sit amet consectetur adipisicing elit.
           </p>
 
           <div className="designer-credit flex items-center">
@@ -129,7 +129,7 @@ export default function Footer() {
             </div>
             <div>
               <p className="text-[#FFFAFA] text-sm">
-                Kristinne | Diseñadora UX/UI
+                Lorem ipsum dolor sit amet.
                 <br />
                 <span className="text-[#FFFAFA]/60 text-xs">@kristinnebarrera</span>
               </p>
