@@ -181,13 +181,13 @@ const RegisterPage = () => {
       <div className="space-y-4 mt-4">
         {role === "Doctor" && (
           <div>
-            <label className="block text-neutral-300 mb-2">Practice Address</label>
+            <label className="block text-neutralral-300 mb-2">Practice Address</label>
             <input
               type="text"
               value={practiceAddress}
               onChange={(e) => setPracticeAddress(e.target.value)}
               placeholder="Enter your practice address"
-              className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-neutral-400"
+              className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 placehneutralr-neutral-400"
               required
             />
           </div>
@@ -196,35 +196,35 @@ const RegisterPage = () => {
         {role === "Manufacturer" && (
           <>
             <div>
-              <label className="block text-neutral-300 mb-2">Manufacturing Address</label>
+              <label className="block text-neutralral-300 mb-2">Manufacturing Address</label>
               <input
                 type="text"
                 value={manufacturingAddress}
                 onChange={(e) => setManufacturingAddress(e.target.value)}
                 placeholder="Enter manufacturing facility address"
-                className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-neutral-400"
+                className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 placehneutralr-neutral-400"
                 required
               />
             </div>
             <div>
-              <label className="block text-neutral-300 mb-2">GST Number</label>
+              <label className="block text-neutralral-300 mb-2">GST Number</label>
               <input
                 type="text"
                 value={gstNumber}
                 onChange={(e) => setGstNumber(e.target.value)}
                 placeholder="Enter GST registration number"
-                className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-neutral-400"
+                className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 placehneutralr-neutral-400"
                 required
               />
             </div>
             <div>
-              <label className="block text-neutral-300 mb-2">Registration Number</label>
+              <label className="block text-neutralral-300 mb-2">Registration Number</label>
               <input
                 type="text"
                 value={registrationNumber}
                 onChange={(e) => setRegistrationNumber(e.target.value)}
                 placeholder="Enter company registration number"
-                className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-neutral-400"
+                className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 placehneutralr-neutral-400"
                 required
               />
             </div>
@@ -233,13 +233,13 @@ const RegisterPage = () => {
 
         {role === "Distributor" && (
           <div>
-            <label className="block text-neutral-300 mb-2">Distribution Address</label>
+            <label className="block text-neutralral-300 mb-2">Distribution Address</label>
             <input
               type="text"
               value={distributionAddress}
               onChange={(e) => setDistributionAddress(e.target.value)}
               placeholder="Enter distribution center address"
-              className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-neutral-400"
+              className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 placehneutralr-neutral-400"
               required
             />
           </div>
@@ -247,20 +247,20 @@ const RegisterPage = () => {
 
         {role === "Retailer" && (
           <div>
-            <label className="block text-neutral-300 mb-2">Retail Address</label>
+            <label className="block text-neutralral-300 mb-2">Retail Address</label>
             <input
               type="text"
               value={retailAddress}
               onChange={(e) => setRetailAddress(e.target.value)}
               placeholder="Enter retail location address"
-              className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-neutral-400"
+              className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 placehneutralr-neutral-400"
               required
             />
           </div>
         )}
 
         {role === "Donor" && (
-          <div className="text-neutral-300">
+          <div className="text-neutralral-300">
             <p>Please upload your government ID document in the next step.</p>
           </div>
         )}
@@ -287,7 +287,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-neutral-800 rounded-lg shadow-lg border border-neutral-700">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-neutralral-800 rounded-lg shadow-lg border bordneutraleutral-700">
       <h1 className="text-2xl font-bold text-center mb-6 text-white">Register Your Details</h1>
       
       {error && (
@@ -304,15 +304,15 @@ const RegisterPage = () => {
 
       {step === 1 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-blue-400">Step 1: Enter Your Name</h2>
+          <h2 className="text-xl font-semibold text-green-400">Step 1: Enter Your Name</h2>
           <div>
-            <label className="block text-neutral-300 mb-2">Name</label>
+            <label className="block text-neutralral-300 mb-2">Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your full name"
-              className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-neutral-400"
+              className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 placehneutralr-neutral-400"
               required
             />
           </div>
@@ -320,7 +320,7 @@ const RegisterPage = () => {
             <button
               onClick={nextStep}
               disabled={!account || !name}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-neutral-600 disabled:text-neutral-400"
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-neutralral-600 disabled:teneutraleutral-400"
             >
               Next
             </button>
@@ -330,13 +330,13 @@ const RegisterPage = () => {
 
       {step === 2 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-blue-400">Step 2: Choose Your Role</h2>
+          <h2 className="text-xl font-semibold text-green-400">Step 2: Choose Your Role</h2>
           <div>
-            <label className="block text-neutral-300 mb-2">Role</label>
+            <label className="block text-neutralral-300 mb-2">Role</label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               required
             >
               <option value="">Select Role</option>
@@ -355,14 +355,14 @@ const RegisterPage = () => {
           <div className="flex justify-between">
             <button
               onClick={prevStep}
-              className="px-4 py-2 bg-neutral-600 text-neutral-200 rounded-md hover:bg-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              className="px-4 py-2 bg-neutralral-600 teneutraleutral-200 rounded-md hovneutralg-neutral-500 focus:outline-none focus:ring-2 foneutralring-neutral-500"
             >
               Back
             </button>
             <button
               onClick={nextStep}
               disabled={!role || !validateRoleFields()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-neutral-600 disabled:text-neutral-400"
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-neutralral-600 disabled:teneutraleutral-400"
             >
               {role === "Patient" ? "Submit" : "Next"}
             </button>
@@ -372,21 +372,21 @@ const RegisterPage = () => {
 
       {step === 3 && role !== "Patient" && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-blue-400">
+          <h2 className="text-xl font-semibold text-green-400">
             Step 3: Upload Your {role === "Donor" ? "Government ID" : "License"}
           </h2>
           <div>
-            <label className="block text-neutral-300 mb-2">
+            <label className="block text-neutralral-300 mb-2">
               {role === "Donor" ? "Government ID Document" : "Professional License"}
             </label>
             <input
               type="file"
               onChange={handleFileChange}
-              className="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-neutral-600 file:text-neutral-200 hover:file:bg-neutral-500"
+              className="w-full px-4 py-2 bg-neutralral-700 text-white border bordneutraleutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 fineutralg-neutral-600 fneutraltext-neutral-200 honeutralfile:bg-neutral-500"
               required
             />
             {file && (
-              <p className="mt-2 text-sm text-neutral-400">
+              <p className="mt-2 text-sm text-neutralral-400">
                 Selected file: {file.name}
               </p>
             )}
@@ -394,14 +394,14 @@ const RegisterPage = () => {
           <div className="flex justify-between">
             <button
               onClick={prevStep}
-              className="px-4 py-2 bg-neutral-600 text-neutral-200 rounded-md hover:bg-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              className="px-4 py-2 bg-neutralral-600 teneutraleutral-200 rounded-md hovneutralg-neutral-500 focus:outline-none focus:ring-2 foneutralring-neutral-500"
             >
               Back
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading || !file}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-neutral-600 disabled:text-neutral-400"
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-neutralral-600 disabled:teneutraleutral-400"
             >
               {loading ? "Registering..." : "Submit"}
             </button>

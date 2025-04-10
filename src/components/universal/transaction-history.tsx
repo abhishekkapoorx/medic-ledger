@@ -87,7 +87,7 @@ export function TransactionHistory() {
                         href={`https://etherscan.io/tx/${tx.hash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-medium text-blue-600 hover:underline flex items-center"
+                        className="text-sm font-medium text-green-600 hover:underline flex items-center"
                       >
                         {tx.hash}
                         <ExternalLink className="h-3 w-3 ml-1" />

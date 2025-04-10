@@ -7,14 +7,14 @@ const Loading = () => {
       <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="flex flex-col items-center gap-4">
           <Loader2 
-            className="w-12 h-12 text-blue-600 animate-spin" 
+            className="w-12 h-12 text-green-600 animate-spin" 
             strokeWidth={2.5}
           />
           <div className="flex flex-col items-center gap-2">
-            <h2 className="text-xl font-semibold text-neutral-800">
+            <h2 className="text-xl font-semibold text-neutralral-800">
               Loading Content
             </h2>
-            <p className="text-sm text-neutral-500 font-medium animate-pulse">
+            <p className="text-sm text-neutralral-500 font-medium animate-pulse">
               Please wait a moment...
             </p>
           </div>

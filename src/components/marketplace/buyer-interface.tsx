@@ -157,7 +157,7 @@ function MarketplaceBrowser() {
                         Donation Available
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                         {listing.price} ETH
                       </Badge>
                     )}
@@ -225,12 +225,12 @@ function PurchaseMedicineForm() {
           <Textarea id="address" placeholder="Enter your full delivery address" />
         </div>
 
-        <div className="rounded-md bg-blue-50 p-3 border border-blue-200">
+        <div className="rounded-md bg-green-50 p-3 border border-green-200">
           <div className="flex items-start gap-2">
-            <CreditCard className="h-5 w-5 text-blue-500 mt-0.5" />
+            <CreditCard className="h-5 w-5 text-green-500 mt-0.5" />
             <div>
-              <h4 className="font-medium text-blue-800">Secure Transaction</h4>
-              <p className="text-sm text-blue-700">
+              <h4 className="font-medium text-green-800">Secure Transaction</h4>
+              <p className="text-sm text-green-700">
                 Your payment will be held in escrow until you confirm receipt of the medicine.
               </p>
             </div>
@@ -266,14 +266,14 @@ function DonationRequestForm() {
           <div className="flex items-center justify-center w-full">
             <label
               htmlFor="income-verification"
-              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-neutral-50 hover:bg-neutral-100"
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-neutralral-50 hover:neutraleutral-100"
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Upload className="w-8 h-8 mb-2 text-neutral-500" />
-                <p className="mb-2 text-sm text-neutral-500">
+                <Upload className="w-8 h-8 mb-2 text-neutralral-500" />
+                <p className="mb-2 text-sm text-neutralral-500">
                   <span className="font-semibold">Click to upload</span> or drag and drop
                 </p>
-                <p className="text-xs text-neutral-500">PDF, JPG or PNG (MAX. 2MB)</p>
+                <p className="text-xs text-neutralral-500">PDF, JPG or PNG (MAX. 2MB)</p>
               </div>
               <Input id="income-verification" type="file" className="hidden" />
             </label>
@@ -285,14 +285,14 @@ function DonationRequestForm() {
           <div className="flex items-center justify-center w-full">
             <label
               htmlFor="prescription-upload"
-              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-neutral-50 hover:bg-neutral-100"
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-neutralral-50 hover:neutraleutral-100"
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <FileText className="w-8 h-8 mb-2 text-neutral-500" />
-                <p className="mb-2 text-sm text-neutral-500">
+                <FileText className="w-8 h-8 mb-2 text-neutralral-500" />
+                <p className="mb-2 text-sm text-neutralral-500">
                   <span className="font-semibold">Upload prescription</span> or enter NFT ID
                 </p>
-                <p className="text-xs text-neutral-500">PDF, JPG or PNG (MAX. 2MB)</p>
+                <p className="text-xs text-neutralral-500">PDF, JPG or PNG (MAX. 2MB)</p>
               </div>
               <Input id="prescription-upload" type="file" className="hidden" />
             </label>

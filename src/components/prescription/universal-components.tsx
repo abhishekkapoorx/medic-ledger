@@ -51,14 +51,14 @@ export default function UniversalComponents() {
                 <div
                   className={`absolute -left-[25px] w-10 h-10 rounded-full flex items-center justify-center ${
                     event.type === "Created"
-                      ? "bg-blue-100"
+                      ? "bg-green-100"
                       : event.type === "Fulfilled"
                         ? "bg-green-100"
                         : "bg-purple-100"
                   }`}
                 >
                   {event.type === "Created" ? (
-                    <FileText className="h-5 w-5 text-blue-600" />
+                    <FileText className="h-5 w-5 text-green-600" />
                   ) : event.type === "Fulfilled" ? (
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   ) : (
@@ -71,7 +71,7 @@ export default function UniversalComponents() {
                       variant="outline"
                       className={`mr-2 ${
                         event.type === "Created"
-                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          ? "bg-green-50 text-green-700 border-green-200"
                           : event.type === "Fulfilled"
                             ? "bg-green-50 text-green-700 border-green-200"
                             : "bg-purple-50 text-purple-700 border-purple-200"

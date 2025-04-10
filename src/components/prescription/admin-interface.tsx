@@ -211,7 +211,7 @@ export default function AdminInterface() {
                   </Card>
                   <Card>
                     <CardContent className="p-4 flex flex-col items-center justify-center">
-                      <Users className="h-8 w-8 text-blue-500 mb-2" />
+                      <Users className="h-8 w-8 text-green-500 mb-2" />
                       <p className="text-2xl font-bold">12</p>
                       <p className="text-sm text-muted-foreground">Active Doctors</p>
                     </CardContent>

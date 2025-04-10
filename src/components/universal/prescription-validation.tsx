@@ -36,13 +36,13 @@ export function PrescriptionValidation() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium">Doctor Verification</h4>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
               Verified
             </Badge>
           </div>
           <div className="flex items-center space-x-2 p-2 border rounded-md">
-            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-              <User className="h-4 w-4 text-blue-600" />
+            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+              <User className="h-4 w-4 text-green-600" />
             </div>
             <div>
               <div className="text-sm font-medium">Dr. Sarah Johnson</div>

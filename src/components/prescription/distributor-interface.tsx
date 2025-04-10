@@ -170,7 +170,7 @@ export default function DistributorInterface() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center">
-                            <Thermometer className="h-4 w-4 mr-1 text-blue-500" />
+                            <Thermometer className="h-4 w-4 mr-1 text-green-500" />
                             {medicine.storageTemp}
                           </div>
                         </TableCell>

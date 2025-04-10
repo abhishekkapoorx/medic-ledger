@@ -118,7 +118,7 @@ export default function MedicineDetailsPage({ params }: { params: { id: string }
                   <div>
                     <span className="font-medium">Storage Requirements:</span>
                     <div className="flex items-center mt-1">
-                      <Thermometer className="h-4 w-4 mr-2 text-blue-500" />
+                      <Thermometer className="h-4 w-4 mr-2 text-green-500" />
                       <span className="text-sm">{medicine.storageRequirements}</span>
                     </div>
                   </div>
