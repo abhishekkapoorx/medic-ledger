@@ -3,6 +3,7 @@ import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/providers/theme-provider";
+import Header from "@/components/header";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -31,13 +32,16 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          
+
           {/* <Navbar /> */}
-          {children}
+          <Header />
+          <div className="">
+            {children}
+          </div>
 
         </ThemeProvider>
       </body>
