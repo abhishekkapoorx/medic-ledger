@@ -324,7 +324,7 @@ export default function DoctorInterface() {
                               Yes
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+                            <Badge variant="outline" className="bg-neutral-50 text-neutral-700 border-neutral-200">
                               No
                             </Badge>
                           )}

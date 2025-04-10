@@ -266,14 +266,14 @@ function DonationRequestForm() {
           <div className="flex items-center justify-center w-full">
             <label
               htmlFor="income-verification"
-              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-neutral-50 hover:bg-neutral-100"
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                <p className="mb-2 text-sm text-gray-500">
+                <Upload className="w-8 h-8 mb-2 text-neutral-500" />
+                <p className="mb-2 text-sm text-neutral-500">
                   <span className="font-semibold">Click to upload</span> or drag and drop
                 </p>
-                <p className="text-xs text-gray-500">PDF, JPG or PNG (MAX. 2MB)</p>
+                <p className="text-xs text-neutral-500">PDF, JPG or PNG (MAX. 2MB)</p>
               </div>
               <Input id="income-verification" type="file" className="hidden" />
             </label>
@@ -285,14 +285,14 @@ function DonationRequestForm() {
           <div className="flex items-center justify-center w-full">
             <label
               htmlFor="prescription-upload"
-              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-neutral-50 hover:bg-neutral-100"
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <FileText className="w-8 h-8 mb-2 text-gray-500" />
-                <p className="mb-2 text-sm text-gray-500">
+                <FileText className="w-8 h-8 mb-2 text-neutral-500" />
+                <p className="mb-2 text-sm text-neutral-500">
                   <span className="font-semibold">Upload prescription</span> or enter NFT ID
                 </p>
-                <p className="text-xs text-gray-500">PDF, JPG or PNG (MAX. 2MB)</p>
+                <p className="text-xs text-neutral-500">PDF, JPG or PNG (MAX. 2MB)</p>
               </div>
               <Input id="prescription-upload" type="file" className="hidden" />
             </label>

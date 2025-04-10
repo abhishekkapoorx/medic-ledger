@@ -155,4 +155,11 @@ contract MedicineTokenizer is ERC721, Ownable {
     function setUserRegistry(address _newRegistry) external onlyOwner {
         userRegistryAddress = _newRegistry;
     }
+
+    /**
+     * @dev Get the next token ID (for testing purposes)
+     */
+    function getNextTokenId() external view returns (uint256) {
+        return _nextTokenId;
+    }
 }

@@ -162,7 +162,7 @@ export default function PatientInterface() {
               <Card key={medicine.id}>
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4">
-                    <div className="w-20 h-20 bg-gray-100 rounded flex items-center justify-center">
+                    <div className="w-20 h-20 bg-neutral-100 rounded flex items-center justify-center">
                       <img
                         src={medicine.ipfsImage || "/placeholder.svg"}
                         alt={medicine.name}

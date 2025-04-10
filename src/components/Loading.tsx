@@ -11,10 +11,10 @@ const Loading = () => {
             strokeWidth={2.5}
           />
           <div className="flex flex-col items-center gap-2">
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-neutral-800">
               Loading Content
             </h2>
-            <p className="text-sm text-gray-500 font-medium animate-pulse">
+            <p className="text-sm text-neutral-500 font-medium animate-pulse">
               Please wait a moment...
             </p>
           </div>

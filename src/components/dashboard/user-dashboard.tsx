@@ -67,15 +67,15 @@ export default function UserDashboard() {
             
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <CheckCircle className={userData.isVerified ? "text-green-500" : "text-gray-300"} size={16} />
+                <CheckCircle className={userData.isVerified ? "text-green-500" : "text-neutral-300"} size={16} />
                 <span>Verification Status: {userData.isVerified ? "Verified" : "Not Verified"}</span>
               </div>
               <div className="flex items-center gap-2">
-                <CalendarIcon className="text-gray-500" size={16} />
+                <CalendarIcon className="text-neutral-500" size={16} />
                 <span>Registered on: {formattedDate}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FileText className="text-gray-500" size={16} />
+                <FileText className="text-neutral-500" size={16} />
                 <span className="text-sm truncate" title={truncateEthAddress(userData.licenseIPFSHash)}>
                   License: {userData.licenseIPFSHash ? 
                     (userData.licenseIPFSHash.length > 20 ? 
@@ -110,7 +110,7 @@ export default function UserDashboard() {
                     <Clock size={24} />
                     <div>
                       <h3 className="font-medium">No recent prescriptions</h3>
-                      <p className="text-sm text-gray-500">You haven't created any prescriptions yet.</p>
+                      <p className="text-sm text-neutral-500">You haven't created any prescriptions yet.</p>
                     </div>
                   </div>
                 </div>
@@ -121,7 +121,7 @@ export default function UserDashboard() {
                     <Clock size={24} />
                     <div>
                       <h3 className="font-medium">No medicine records</h3>
-                      <p className="text-sm text-gray-500">No medicine transactions found.</p>
+                      <p className="text-sm text-neutral-500">No medicine transactions found.</p>
                     </div>
                   </div>
                 </div>
@@ -132,7 +132,7 @@ export default function UserDashboard() {
                     <Clock size={24} />
                     <div>
                       <h3 className="font-medium">No recent transactions</h3>
-                      <p className="text-sm text-gray-500">Your transaction history is empty.</p>
+                      <p className="text-sm text-neutral-500">Your transaction history is empty.</p>
                     </div>
                   </div>
                 </div>
