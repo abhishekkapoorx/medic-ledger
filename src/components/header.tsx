@@ -59,7 +59,7 @@ export default function Header() {
   return (
     <motion.header
       ref={ref}
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`sticky top-0 w-full z-50 transition-all duration-300 ${
         isScrolled ? "bg-[#141414]/90 backdrop-blur-md py-2" : "bg-transparent py-4"
       }`}
       initial={{ opacity: 0, y: -20 }}
