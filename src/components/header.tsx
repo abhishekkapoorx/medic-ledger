@@ -76,19 +76,19 @@ export default function Header() {
 
         <nav className="hidden md:flex items-center space-x-8">
           <Link href="#nosotros" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
-            Nosotros
+           Home
           </Link>
           <Link href="#deseo-invertir" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
-            Deseo Invertir
+            About
           </Link>
           <Link href="#contactanos" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
-            Contáctanos
+            marketPlace
           </Link>
           <Link
             href="#demo"
             className="cta-button bg-[#308E70] text-[#FFFAFA] px-6 py-2 rounded-md hover:bg-[#308E70]/80 transition-all transform hover:scale-105"
           >
-            Solicitar Demo Gratis
+           Connect your wallet
           </Link>
         </nav>
 
