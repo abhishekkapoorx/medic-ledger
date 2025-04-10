@@ -18,7 +18,7 @@ import { CalendarIcon, Plus, Trash2, Upload, Check, Clock, AlertTriangle, Loader
 import { cn } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { toast } from "sonner"
+import { toast } from "react-hot-toast"
 import ConnectWalletButton from "@/components/ConnectWalletButton"
 
 // Contract ABI and address

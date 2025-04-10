@@ -17,8 +17,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { format } from "date-fns"
-import { CalendarIcon, Upload, Loader2, DollarSign, Tag, Check, ChevronDown } from "lucide-react"
+import { CalendarIcon, Upload, Loader2, DollarSign, Tag, Check, ChevronDown, History, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ethers } from "ethers"
 import toast from "react-hot-toast"
@@ -51,6 +59,13 @@ interface Medicine {
   currentOwner: string;
   isListed?: boolean;
   listingPrice?: string;
+  transferHistory?: OwnershipRecord[];
+}
+
+interface OwnershipRecord {
+  owner: string;
+  timestamp: Date;
+  transactionHash?: string;
 }
 
 export default function ManufacturerInterface() {
@@ -70,7 +85,7 @@ export default function ManufacturerInterface() {
   const [selectedMedicine, setSelectedMedicine] = useState<string | null>(null);
   const [listingPrice, setListingPrice] = useState("");
   const [isListing, setIsListing] = useState(false);
-  const [activeTab, setActiveTab] = useState("mint"); // 'mint' or 'sell'
+  const [activeTab, setActiveTab] = useState("mint"); // 'mint' or 'sell' or 'transfer'
   
   // Blockchain connection states
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
@@ -79,6 +94,15 @@ export default function ManufacturerInterface() {
   const [marketplaceContract, setMarketplaceContract] = useState<ethers.Contract | null>(null);
   const [connectedAccount, setConnectedAccount] = useState<string>("");
   const [isConnected, setIsConnected] = useState(false);
+
+  // State for direct transfer
+  const [recipientAddress, setRecipientAddress] = useState("");
+  const [selectedMedicineForTransfer, setSelectedMedicineForTransfer] = useState<string | null>(null);
+  const [isTransferring, setIsTransferring] = useState(false);
+
+  // New state for medicine history
+  const [selectedMedicineForHistory, setSelectedMedicineForHistory] = useState<Medicine | null>(null);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
 
   // Initialize provider on component mount
   useEffect(() => {
@@ -151,33 +175,142 @@ export default function ManufacturerInterface() {
     }
   };
 
-  // Fetch medicines minted by the connected manufacturer
+  // Function to verify listing status from contract
+  const verifyListingStatus = async (tokenId: string) => {
+    if (!marketplaceContract) return false;
+    try {
+      // Convert tokenId to number for contract call
+      const tokenIdNum = parseInt(tokenId);
+      
+      // Get the listing details
+      const listing = await marketplaceContract.listings(tokenIdNum);
+      
+      // Check if the listing exists and is active
+      return listing && listing.isActive;
+    } catch (error) {
+      console.error("Error verifying listing:", error);
+      // If the listing doesn't exist, it will throw an error
+      // This is expected behavior for unlisted tokens
+      return false;
+    }
+  };
+
+  // List medicine in marketplace for distributors
+  const handleListMedicine = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!marketplaceContract || !signer || !selectedMedicine) {
+      toast.error("Please connect wallet and select a medicine");
+      return;
+    }
+    
+    // Validate price
+    if (!listingPrice || parseFloat(listingPrice) <= 0) {
+      toast.error("Please enter a valid price");
+      return;
+    }
+    
+    setIsListing(true);
+    try {
+      // Convert price to wei
+      const priceInWei = ethers.parseEther(listingPrice);
+      const tokenId = selectedMedicine;
+      
+      // Check if medicine contract is approved for marketplace
+      const isApproved = await medicineContract!.isApprovedForAll(
+        connectedAccount,
+        MARKETPLACE_ADDRESS
+      );
+      
+      // If not approved, request approval first
+      if (!isApproved) {
+        toast.loading("Approving marketplace to transfer medicines...");
+        const approveTx = await medicineContract!.setApprovalForAll(
+          MARKETPLACE_ADDRESS,
+          true
+        );
+        await approveTx.wait();
+        toast.dismiss();
+        toast.success("Marketplace approved successfully!");
+      }
+      
+      // List the medicine
+      toast.loading("Listing medicine on marketplace...");
+      const tx = await marketplaceContract.listMedicine(tokenId, priceInWei);
+      const receipt = await tx.wait();
+      toast.dismiss();
+      
+      if (receipt.status === 1) {
+        // Wait a moment for the blockchain to update
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Verify the listing was actually created on the contract
+        const isListed = await verifyListingStatus(tokenId);
+        
+        if (isListed) {
+          toast.success(`Medicine #${tokenId} listed for ${listingPrice} ETH`);
+          
+          // Update the medicine's listing status in the state
+          setMintedMedicines(prevMedicines => 
+            prevMedicines.map(medicine => 
+              medicine.tokenId === tokenId 
+                ? { ...medicine, isListed: true, listingPrice: listingPrice }
+                : medicine
+            )
+          );
+          
+          // Reset form
+          setSelectedMedicine(null);
+          setListingPrice("");
+        } else {
+          throw new Error("Listing verification failed - please refresh the page to check listing status");
+        }
+      } else {
+        throw new Error("Transaction failed");
+      }
+      
+    } catch (error: any) {
+      console.error("Listing failed:", error);
+      toast.error(error.reason || error.message || "Transaction failed");
+    } finally {
+      setIsListing(false);
+    }
+  };
+
+  // Update fetchMintedMedicines to include listing status
   const fetchMintedMedicines = async () => {
     if (!medicineContract || !connectedAccount) return;
 
     setIsLoadingMedicines(true);
     try {
-      // We need to get the total supply and iterate through tokens to find ones minted by this manufacturer
-      // This is an example approach - you might need to adjust based on your contract's capabilities
-      
-      // In a real implementation, you would query events or create a specialized view function
-      // For this example, we'll simulate by checking the next token ID and iterating backwards
-      
       const nextTokenId = await medicineContract.getNextTokenId?.() || 0;
       const medicines: Medicine[] = [];
       
-      // Check the last 20 tokens (limit the loop for performance)
       const startId = Math.max(0, Number(nextTokenId) - 20);
       
       for (let i = startId; i < Number(nextTokenId); i++) {
         try {
-          // Check if the token exists and belongs to the current user
           const owner = await medicineContract.ownerOf(i);
           
           if (owner.toLowerCase() === connectedAccount.toLowerCase()) {
             const details = await medicineContract.getMedicineDetails(i);
             
-            // Format the medicine data
+            // Check listing status from marketplace contract
+            let isListed = false;
+            let listingPrice = "0";
+            if (marketplaceContract) {
+              try {
+                const listing = await marketplaceContract.listings(i);
+                if (listing && listing.isActive) {
+                  isListed = true;
+                  listingPrice = ethers.formatEther(listing.price);
+                }
+              } catch (err) {
+                // Token is not listed - this is expected
+                console.log(`Token ${i} is not listed`);
+              }
+            }
+            
             const medicine: Medicine = {
               tokenId: i.toString(),
               name: details.name,
@@ -189,26 +322,13 @@ export default function ManufacturerInterface() {
               ipfsHash: details.ipfsHash,
               manufacturer: details.manufacturer,
               currentOwner: details.currentOwner,
-              isListed: false
+              isListed,
+              listingPrice
             };
-            
-            // Check if this medicine is already listed in the marketplace
-            if (marketplaceContract) {
-              try {
-                const listing = await marketplaceContract.listings(i);
-                if (listing && listing.isActive) {
-                  medicine.isListed = true;
-                  medicine.listingPrice = ethers.formatEther(listing.price);
-                }
-              } catch (err) {
-                // Token might not be listed - continue
-              }
-            }
             
             medicines.push(medicine);
           }
         } catch (err) {
-          // Token might not exist or other error - continue to next token
           continue;
         }
       }
@@ -362,66 +482,6 @@ export default function ManufacturerInterface() {
     }
   };
 
-  // List medicine in marketplace for distributors
-  const handleListMedicine = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!marketplaceContract || !signer || !selectedMedicine) {
-      toast.error("Please connect wallet and select a medicine");
-      return;
-    }
-    
-    // Validate price
-    if (!listingPrice || parseFloat(listingPrice) <= 0) {
-      toast.error("Please enter a valid price");
-      return;
-    }
-    
-    setIsListing(true);
-    try {
-      // Convert price to wei
-      const priceInWei = ethers.parseEther(listingPrice);
-      const tokenId = selectedMedicine;
-      
-      // Check if medicine contract is approved for marketplace
-      const isApproved = await medicineContract!.isApprovedForAll(
-        connectedAccount,
-        MARKETPLACE_ADDRESS
-      );
-      
-      // If not approved, request approval first
-      if (!isApproved) {
-        toast.loading("Approving marketplace to transfer medicines...");
-        const approveTx = await medicineContract!.setApprovalForAll(
-          MARKETPLACE_ADDRESS,
-          true
-        );
-        await approveTx.wait();
-        toast.dismiss();
-        toast.success("Marketplace approved successfully!");
-      }
-      
-      // List the medicine
-      toast.loading("Listing medicine on marketplace...");
-      const tx = await marketplaceContract.listMedicine(tokenId, priceInWei);
-      await tx.wait();
-      toast.dismiss();
-      
-      toast.success(`Medicine #${tokenId} listed for ${listingPrice} ETH`);
-      
-      // Reset form and refresh medicines
-      setSelectedMedicine(null);
-      setListingPrice("");
-      fetchMintedMedicines();
-      
-    } catch (error: any) {
-      console.error("Listing failed:", error);
-      toast.error(error.reason || error.message || "Transaction failed");
-    } finally {
-      setIsListing(false);
-    }
-  };
-
   // Cancel medicine listing
   const handleCancelListing = async (tokenId: string) => {
     if (!marketplaceContract) return;
@@ -447,6 +507,158 @@ export default function ManufacturerInterface() {
   const formatAddress = (address: string) => {
     if (!address) return "";
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  // Fetch medicine history
+  const fetchMedicineHistory = async (tokenId: string) => {
+    if (!medicineContract || !provider) return [];
+    
+    try {
+      // Get ownership history directly from the contract's new function
+      const ownershipRecords = await medicineContract.getOwnershipHistory(parseInt(tokenId));
+      
+      // Format ownership records
+      const history: OwnershipRecord[] = [];
+      
+      // Convert contract data to our frontend format
+      if (ownershipRecords && ownershipRecords.length > 0) {
+        for (let i = 0; i < ownershipRecords.length; i++) {
+          const record = ownershipRecords[i];
+          history.push({
+            owner: record.owner,
+            timestamp: new Date(Number(record.timestamp) * 1000),
+            transactionHash: i === 0 ? "Original Minting" : `Transfer #${i}`
+          });
+        }
+      } else {
+        // Fallback to fetching basic details if history isn't available
+        const medicineDetails = await medicineContract.getMedicineDetails(parseInt(tokenId));
+        
+        // Add manufacturer as the first owner
+        history.push({
+          owner: medicineDetails.manufacturer,
+          timestamp: new Date(Number(medicineDetails.manufactureDate) * 1000),
+          transactionHash: "Original Minting"
+        });
+        
+        // If current owner is different from manufacturer, add current owner
+        if (medicineDetails.currentOwner.toLowerCase() !== medicineDetails.manufacturer.toLowerCase()) {
+          history.push({
+            owner: medicineDetails.currentOwner,
+            timestamp: new Date(), // We don't know exact time, use current time as approximation
+            transactionHash: "Current Owner"
+          });
+        }
+      }
+      
+      return history;
+    } catch (error) {
+      console.error("Error fetching medicine history:", error);
+      
+      // Fallback to basic details if the new function fails (in case contract is not upgraded yet)
+      try {
+        const medicineDetails = await medicineContract.getMedicineDetails(parseInt(tokenId));
+        const history: OwnershipRecord[] = [];
+        
+        history.push({
+          owner: medicineDetails.manufacturer,
+          timestamp: new Date(Number(medicineDetails.manufactureDate) * 1000),
+          transactionHash: "Original Minting"
+        });
+        
+        if (medicineDetails.currentOwner.toLowerCase() !== medicineDetails.manufacturer.toLowerCase()) {
+          history.push({
+            owner: medicineDetails.currentOwner,
+            timestamp: new Date(),
+            transactionHash: "Current Owner"
+          });
+        }
+        
+        return history;
+      } catch (err) {
+        console.error("Error in fallback history fetching:", err);
+        return [];
+      }
+    }
+  };
+
+  // Handle showing medicine history
+  const handleShowHistory = async (medicine: Medicine) => {
+    // If we already have transfer history and it's not empty, use it
+    if (medicine.transferHistory && medicine.transferHistory.length > 0) {
+      setSelectedMedicineForHistory(medicine);
+      setIsHistoryDialogOpen(true);
+      return;
+    }
+    
+    // Otherwise fetch the history
+    const history = await fetchMedicineHistory(medicine.tokenId);
+    
+    // Update the medicine with transfer history
+    const updatedMedicine = { ...medicine, transferHistory: history };
+    
+    // Update the selected medicine and the medicines list
+    setSelectedMedicineForHistory(updatedMedicine);
+    setMintedMedicines(prevMedicines => 
+      prevMedicines.map(m => 
+        m.tokenId === medicine.tokenId ? updatedMedicine : m
+      )
+    );
+    
+    setIsHistoryDialogOpen(true);
+  };
+
+  // Direct transfer medicine to a distributor
+  const handleDirectTransfer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!medicineContract || !signer || !selectedMedicineForTransfer) {
+      toast.error("Please connect wallet and select a medicine");
+      return;
+    }
+    
+    // Validate recipient address
+    if (!recipientAddress || !ethers.isAddress(recipientAddress)) {
+      toast.error("Please enter a valid recipient address");
+      return;
+    }
+    
+    setIsTransferring(true);
+    try {
+      // Call safeTransferFrom to transfer the medicine NFT
+      const tokenId = selectedMedicineForTransfer;
+      
+      toast.loading("Transferring medicine NFT...");
+      const tx = await medicineContract["safeTransferFrom(address,address,uint256)"](
+        connectedAccount,
+        recipientAddress,
+        tokenId
+      );
+      
+      const receipt = await tx.wait();
+      toast.dismiss();
+      
+      if (receipt.status === 1) {
+        toast.success(`Medicine #${tokenId} transferred to ${recipientAddress}`);
+        
+        // Update medicines list to reflect the transfer
+        setMintedMedicines(prevMedicines => 
+          prevMedicines.filter(medicine => medicine.tokenId !== tokenId)
+        );
+        
+        // Reset form
+        setSelectedMedicineForTransfer(null);
+        setRecipientAddress("");
+      } else {
+        throw new Error("Transfer failed");
+      }
+      
+    } catch (error: any) {
+      console.error("Transfer failed:", error);
+      toast.error(error.reason || error.message || "Transfer failed");
+    } finally {
+      setIsTransferring(false);
+    }
   };
 
   return (
@@ -495,6 +707,12 @@ export default function ManufacturerInterface() {
               variant={activeTab === "sell" ? "default" : "outline"}
             >
               Sell to Distributors
+            </Button>
+            <Button 
+              onClick={() => setActiveTab("transfer")} 
+              variant={activeTab === "transfer" ? "default" : "outline"}
+            >
+              Direct Transfer
             </Button>
           </div>
         </div>
@@ -665,6 +883,14 @@ export default function ManufacturerInterface() {
                             >
                               View
                             </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleShowHistory(medicine)}
+                            >
+                              <History className="h-4 w-4 mr-1" />
+                              History
+                            </Button>
                             {!medicine.isListed && (
                               <Button
                                 variant="secondary"
@@ -823,6 +1049,163 @@ export default function ManufacturerInterface() {
           </Card>
         </div>
       )}
+      
+      {isConnected && activeTab === "transfer" && (
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Transfer Medicine to Distributor</CardTitle>
+              <CardDescription>Directly transfer medicine NFT to a distributor's wallet</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleDirectTransfer} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="medicineSelectTransfer">Select Medicine</Label>
+                  <Select
+                    value={selectedMedicineForTransfer || ""}
+                    onValueChange={(value) => setSelectedMedicineForTransfer(value)}
+                    disabled={isTransferring || mintedMedicines.length === 0}
+                  >
+                    <SelectTrigger className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                      <SelectValue placeholder="-- Select Medicine --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {mintedMedicines
+                          .filter(m => !m.isListed) // Only show non-listed medicines
+                          .map((medicine) => (
+                            <SelectItem key={medicine.tokenId} value={medicine.tokenId}>
+                              ID: {medicine.tokenId} - {medicine.name} (Batch: {medicine.batchNumber})
+                            </SelectItem>
+                          ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="recipientAddress">Recipient Address</Label>
+                  <Input
+                    id="recipientAddress"
+                    placeholder="0x..."
+                    value={recipientAddress}
+                    onChange={(e) => setRecipientAddress(e.target.value)}
+                    disabled={isTransferring}
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={!selectedMedicineForTransfer || !recipientAddress || isTransferring}
+                >
+                  {isTransferring ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Transferring...
+                    </>
+                  ) : (
+                    'Transfer Medicine NFT'
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Transfer Instructions</CardTitle>
+              <CardDescription>How to safely transfer medicine NFTs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800 p-4">
+                  <h3 className="text-lg font-medium mb-2">Important Notes</h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Only transfer medicines to verified distributors</li>
+                    <li>The recipient must be registered in the system</li>
+                    <li>Once transferred, you cannot reverse the transaction</li>
+                    <li>Transfer uses the safe ERC721 transfer method</li>
+                    <li>Ensure the recipient address is correct before proceeding</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Benefits of Direct Transfer</h3>
+                  <p>Direct transfers allow you to:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Skip marketplace fees</li>
+                    <li>Transfer to specific business partners</li>
+                    <li>Complete private transactions</li>
+                    <li>Maintain complete supply chain records</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      {/* Medicine History Dialog */}
+      <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Medicine Transfer History</DialogTitle>
+            <DialogDescription>
+              {selectedMedicineForHistory ? (
+                `${selectedMedicineForHistory.name} (Batch: ${selectedMedicineForHistory.batchNumber})`
+              ) : 'Loading...'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="max-h-[400px] overflow-y-auto">
+            {selectedMedicineForHistory?.transferHistory?.length ? (
+              <div className="space-y-4 py-4">
+                {selectedMedicineForHistory.transferHistory.map((record, index) => (
+                  <div key={index} className="flex flex-col">
+                    <div className="flex items-center mb-2">
+                      <div className={`h-10 w-10 rounded-full flex items-center justify-center 
+                        ${index === 0 ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
+                        {index === 0 ? (
+                          <Tag className="h-5 w-5" />
+                        ) : (
+                          <ArrowRight className="h-5 w-5" />
+                        )}
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium">
+                          {index === 0 ? 'Original Manufacturer' : `Transfer #${index}`}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(record.timestamp, "MMM d, yyyy h:mm a")}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="ml-5 pl-5 border-l border-dashed">
+                      <div className="rounded-md border p-3 bg-muted/50">
+                        <p className="text-xs font-medium mb-1">Owner</p>
+                        <p className="text-sm break-all">{record.owner}</p>
+                        
+                        {record.transactionHash && record.transactionHash !== "Original Minting" && (
+                          <>
+                            <p className="text-xs font-medium mt-2 mb-1">Transaction</p>
+                            <p className="text-sm break-all">{record.transactionHash}</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-6 text-center">
+                <p>No transfer history available for this medicine.</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

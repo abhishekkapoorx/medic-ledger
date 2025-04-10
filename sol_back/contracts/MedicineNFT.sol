@@ -27,9 +27,18 @@ contract MedicineTokenizer is ERC721, Ownable {
         address currentOwner;
     }
 
+    // Ownership history record structure
+    struct OwnershipRecord {
+        address owner;
+        uint256 timestamp;
+    }
+
     // State variables
     address public userRegistryAddress;
     mapping(uint256 => MedicineDetails) private _medicineData;
+    
+    // Storage for ownership history
+    mapping(uint256 => OwnershipRecord[]) private _ownershipHistory;
 
     // Events
     event MedicineMinted(
@@ -96,6 +105,12 @@ contract MedicineTokenizer is ERC721, Ownable {
             currentOwner: msg.sender
         });
 
+        // Add first ownership record - the manufacturer
+        _ownershipHistory[newTokenId].push(OwnershipRecord({
+            owner: msg.sender,
+            timestamp: block.timestamp
+        }));
+
         _safeMint(msg.sender, newTokenId);
         emit MedicineMinted(newTokenId, msg.sender, _batchNumber, _expiryDate);
     }
@@ -114,6 +129,19 @@ contract MedicineTokenizer is ERC721, Ownable {
     }
 
     /**
+     * @dev Get ownership history of a medicine
+     * @param tokenId NFT token ID
+     */
+    function getOwnershipHistory(uint256 tokenId)
+        external
+        view
+        returns (OwnershipRecord[] memory)
+    {
+        require(_exists(tokenId), "Invalid token ID");
+        return _ownershipHistory[tokenId];
+    }
+
+    /**
      * @dev Check if token exists
      * @param tokenId NFT token ID
      */
@@ -122,7 +150,7 @@ contract MedicineTokenizer is ERC721, Ownable {
     }
 
     /**
-     * @dev Override transfer logic to track current owner
+     * @dev Override transfer logic to track current owner and ownership history
      */
     function _update(
         address to,
@@ -130,7 +158,19 @@ contract MedicineTokenizer is ERC721, Ownable {
         address auth
     ) internal override returns (address) {
         address previousOwner = super._update(to, tokenId, auth);
-        _medicineData[tokenId].currentOwner = ownerOf(tokenId);
+        
+        // Update current owner in medicine details
+        _medicineData[tokenId].currentOwner = to;
+        
+        // Don't record if it's initial minting (previousOwner is zero address)
+        if (previousOwner != address(0) && to != previousOwner) {
+            // Add new ownership record to history
+            _ownershipHistory[tokenId].push(OwnershipRecord({
+                owner: to,
+                timestamp: block.timestamp
+            }));
+        }
+        
         emit OwnershipTransferred(tokenId, previousOwner, to);
         return previousOwner;
     }
