@@ -27,7 +27,7 @@ export default function UniversalComponents() {
 
   const handleViewDetails = () => {
     // Navigate to medicine details page
-    router.push("/medicine/123")
+    router.push("/medicine/details/123")
   }
 
   return (
