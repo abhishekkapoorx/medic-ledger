@@ -55,7 +55,7 @@ export default function Home() {
       </div>
       <TestimonialsSection />
       <FeaturesSection />
-      <WhyAISection />
+      {/* <WhyAISection />
       <ApplicationsSection />
       <GenieSection />
       <TransformationSection />

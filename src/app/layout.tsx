@@ -4,7 +4,7 @@ import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/providers/theme-provider";
-import Header from "@/components/header"
+import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ReduxProvider from "@/providers/redux-provider";
 
@@ -40,6 +40,7 @@ export default function RootLayout({
           >
             <Header />
             {children}
+            <Footer />
           </ThemeProvider>
         </ReduxProvider>
       </body>

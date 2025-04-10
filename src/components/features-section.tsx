@@ -4,7 +4,10 @@ import { useEffect, useRef } from "react"
 import { useInView } from "react-intersection-observer"
 import gsap from "gsap"
 import { BarChart3, TrendingUp, Laptop } from "lucide-react"
+import Apart from "../../public/Apart.png"
 import Link from "next/link"
+import Image from "next/image"
+
 
 export default function FeaturesSection() {
   const { ref, inView } = useInView({
@@ -72,7 +75,7 @@ export default function FeaturesSection() {
 
       <div className="container mx-auto px-4 z-10 relative">
         <div className="text-center mb-12">
-          <h2 className="features-title text-3xl md:text-4xl font-bold text-[#308E70] mb-4">¿Qué nos Diferencia?</h2>
+          <h2 className="features-title text-3xl md:text-4xl font-bold text-[#308E70] mb-4">Our Standout Quality</h2>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -84,10 +87,11 @@ export default function FeaturesSection() {
                     <BarChart3 className="w-6 h-6 text-[#308E70]" />
                   </div>
                   <div>
-                    <h3 className="text-[#FFFAFA] font-bold text-lg">Powerful Analytics and Reporting</h3>
+                    <h3 className="text-[#FFFAFA] font-bold text-lg">Decentralizing Pharma for Safer Healthcare
+                    </h3>
                     <p className="text-[#FFFAFA]/70 mt-2">
-                      Acceda a análisis detallados con la información analítica más valiosa disponible en un LLM en
-                      línea.
+                    We’re building a blockchain-powered pharmaceutical ecosystem that ensures transparency, traceability, and trust in every step — from production to patient.
+
                     </p>
                   </div>
                 </div>
@@ -99,10 +103,11 @@ export default function FeaturesSection() {
                     <TrendingUp className="w-6 h-6 text-[#308E70]" />
                   </div>
                   <div>
-                    <h3 className="text-[#FFFAFA] font-bold text-lg">Aumento de Ingresos</h3>
+                    <h3 className="text-[#FFFAFA] font-bold text-lg">Authenticity Through Technology
+                    </h3>
                     <p className="text-[#FFFAFA]/70 mt-2">
-                      Los usuarios informan de un incremento del 14% en los ingresos gracias a nuestras soluciones de
-                      atención médica de IA.
+                    Using NFTs and smart contracts, we authenticate drug batches, verify prescriptions, and eliminate counterfeit medicines from the supply chain.
+
                     </p>
                   </div>
                 </div>
@@ -114,29 +119,29 @@ export default function FeaturesSection() {
                     <Laptop className="w-6 h-6 text-[#308E70]" />
                   </div>
                   <div>
-                    <h3 className="text-[#FFFAFA] font-bold text-lg">Facilidad de Uso</h3>
+                    <h3 className="text-[#FFFAFA] font-bold text-lg">
+Empowering Every Stakeholder
+</h3>
                     <p className="text-[#FFFAFA]/70 mt-2">
-                      Nuestra interfaz intuitiva permite a los usuarios de cualquier nivel técnico aprovechar al máximo
-                      nuestras soluciones de atención médica de IA.
+                    Patients, doctors, manufacturers, and donors all benefit from decentralized access, secure transactions, and an open, inclusive medicine marketplace.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="text-center mt-8">
+              {/* <div className="text-center mt-8">
                 <Link
                   href="#contactanos"
                   className="inline-block bg-[#308E70] text-[#FFFAFA] px-6 py-3 rounded-md hover:bg-[#308E70]/80 transition-all transform hover:scale-105"
                 >
                   Contáctanos
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
 
-          <div className="w-full md:w-2/5" ref={iconsRef}>
+          {/* <div className="w-full md:w-2/5" ref={iconsRef}>
             <div className="relative h-[300px] md:h-[400px]">
-              {/* Technology icons floating */}
               {[
                 { icon: "💻", top: "10%", left: "20%", delay: 0 },
                 { icon: "📱", top: "25%", left: "70%", delay: 0.5 },
@@ -159,10 +164,8 @@ export default function FeaturesSection() {
                 </div>
               ))}
 
-              {/* Red glow in the center */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-gradient-to-r from-[#308E70]/30 to-[#308E70]/5 blur-3xl"></div>
 
-              {/* Connection lines between icons */}
               <svg className="absolute inset-0 w-full h-full" style={{ zIndex: -1 }}>
                 <defs>
                   <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -171,9 +174,11 @@ export default function FeaturesSection() {
                     <stop offset="100%" stopColor="#308E70" stopOpacity="0.1" />
                   </linearGradient>
                 </defs>
-                {/* Lines will be animated with GSAP */}
               </svg>
             </div>
+          </div> */}
+          <div className="">
+            <Image src={Apart} alt="" ></Image>
           </div>
         </div>
       </div>

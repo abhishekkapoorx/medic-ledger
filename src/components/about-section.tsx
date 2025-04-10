@@ -4,7 +4,8 @@ import { useEffect, useRef } from "react"
 import { useInView } from "react-intersection-observer"
 import gsap from "gsap"
 import { Lightbulb, Accessibility, Users } from "lucide-react"
-
+import OurVision from "../../public/Our-vision.png"
+import Image from "next/image"
 export default function AboutSection() {
   const { ref, inView } = useInView({
     triggerOnce: true,
@@ -89,7 +90,10 @@ export default function AboutSection() {
           <div className="w-full md:w-3/5 relative" ref={mapRef}>
             {/* World map with hexagonal pattern */}
             <div className="relative">
-              <div className="absolute inset-0 bg-[url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-upYfzWRk35vEZnvJvq51V1UZxA13Rf.png')] bg-contain bg-center bg-no-repeat"></div>
+              {/* <div className=" bg-[url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-upYfzWRk35vEZnvJvq51V1UZxA13Rf.png')] bg-contain bg-center bg-no-repeat"></div> */}
+              <div className="absolute inset-0 flex items-center justify-center"> 
+                <Image src={OurVision} alt="" className="h-96 w-96 absolute "></Image>
+              </div>
 
               {/* Generate random dots for the map */}
               {Array.from({ length: 100 }).map((_, i) => (
