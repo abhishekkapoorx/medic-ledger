@@ -118,16 +118,16 @@ export default function HeroSection() {
         </div>
 
         <div className="w-full md:w-1/2 mt-12 md:mt-0 relative">
-          {/* Head silhouette with digital elements */}
-          <div ref={headRef} className="relative mx-auto w-[300px] h-[400px] md:w-[400px] md:h-[500px]">
-            {/* Glowing circle behind the head */}
-            {/* <Spline
-         scene="https://prod.spline.design/FJDPOlQagsje2F93/scene.splinecode" 
-        style={{ width: "200px", height: "200px" }}
-      /> */}
-        <Spline
-        scene="https://prod.spline.design/i5jLsUojN5uvdgh9/scene.splinecode" 
+         
+          {/* <div ref={headRef} className="relative mx-auto w-[300px] h-[400px] md:w-[400px] md:h-[500px]"> */}
+        
+           
+           <Spline
+        scene="https://prod.spline.design/Jj9dJqxsVvKoDH24/scene.splinecode" 
+        className="md:w-1/2"
       />
+      </div>
+
 
             {/* Head silhouette */}
             {/* <div className="absolute inset-0 bg-[url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Mee2kMBCERKpDoLf6BNwh9eTtKBlo8.png')] bg-contain bg-center bg-no-repeat"></div> */}
@@ -158,8 +158,8 @@ export default function HeroSection() {
                 }}
               ></div>
             ))} */}
-          </div>
-        </div>
+          {/* </div>
+        </div> */}
       </div>
     </section>
   )
