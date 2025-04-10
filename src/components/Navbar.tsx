@@ -31,35 +31,23 @@ const Navbar: React.FC = () => {
           <NavigationMenu>
             <NavigationMenuList className="flex space-x-4">
               <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink href="/" className={navigationMenuTriggerStyle()}>
                   Home
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Services</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="p-2">
-                    <li>
-                      <NavigationMenuLink href="/services/web-development" className={navigationMenuTriggerStyle()}>
-                        Web Development
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink href='/service' className={navigationMenuTriggerStyle()}>
-                        Mobile Development
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  About
+                <NavigationMenuLink href="/marketplace" className={navigationMenuTriggerStyle()}>
+                  Marketplace
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Contact
+                <NavigationMenuLink href="/medicine" className={navigationMenuTriggerStyle()}>
+                  Medicine
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink href="/prescriptions" className={navigationMenuTriggerStyle()}>
+                  Prescriptions
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
@@ -106,35 +94,23 @@ const Navbar: React.FC = () => {
           <NavigationMenu>
             <NavigationMenuList className="flex flex-col space-y-2">
               <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink href="/" className={navigationMenuTriggerStyle()}>
                   Home
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Services</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="p-2">
-                    <li>
-                      <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                        Web Development
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                        Mobile Development
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  About
+                <NavigationMenuLink href="/marketplace" className={navigationMenuTriggerStyle()}>
+                  Marketplace
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Contact
+                <NavigationMenuLink href="/medicine" className={navigationMenuTriggerStyle()}>
+                  Medicine
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink href="/prescriptions" className={navigationMenuTriggerStyle()}>
+                  Prescriptions
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>

@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/providers/theme-provider";
 import ReduxProvider from "@/providers/redux-provider";
+import Header from "@/components/header";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,7 +37,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar />
+            <Header />
             {children}
           </ThemeProvider>
         </ReduxProvider>
