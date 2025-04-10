@@ -34,13 +34,16 @@ export default function RootLayout({
       <Header />
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          
+
           {/* <Navbar /> */}
-          {children}
+          <Header />
+          <div className="">
+            {children}
+          </div>
 
         </ThemeProvider>
       </body>
