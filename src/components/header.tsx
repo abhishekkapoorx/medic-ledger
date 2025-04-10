@@ -71,20 +71,20 @@ export default function Header() {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link href="/" className="header-logo flex items-center">
           <div className="flex items-center">
-            <span className="text-[#308E70] font-bold text-2xl">Med</span>
-            <span className="text-[#FFFAFA] font-bold text-2xl">ML</span>
+            <span className="text-[#308E70] font-bold text-2xl">Medic</span>
+            <span className="text-[#FFFAFA] font-bold text-2xl">Ledger</span>
           </div>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="#nosotros" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
-            Nosotros
+          <Link href="/medicine" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
+            Medicine
           </Link>
-          <Link href="#deseo-invertir" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
-            Deseo Invertir
+          <Link href="/prescriptions" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
+            Prescriptions
           </Link>
-          <Link href="#contactanos" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
-            Contáctanos
+          <Link href="/marketplace" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
+            Marketplace
           </Link>
           <ConnectWalletButton/>
         </nav>

@@ -37,6 +37,7 @@ async function main() {
   console.log("UserRegistry contract deployed at:", userRegistryAddress);
 }
 
+
 // Run the deployment script
 main()
   .then(() => process.exit(0))
