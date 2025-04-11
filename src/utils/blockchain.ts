@@ -26,7 +26,7 @@ declare global {
  */
 export const initializeProvider = async (): Promise<ethers.BrowserProvider | null> => {
   if (!window.ethereum) {
-    throw new Error("MetaMask not detected! Please install MetaMask.");
+    // throw new Error("MetaMask not detected! Please install MetaMask.");
   }
   
   try {
@@ -56,7 +56,7 @@ export const getSigner = async (provider: ethers.BrowserProvider): Promise<ether
  */
 export const requestAccounts = async (): Promise<string[]> => {
   if (!window.ethereum) {
-    throw new Error("MetaMask not detected! Please install MetaMask.");
+    // throw new Error("MetaMask not detected! Please install MetaMask.");
   }
   
   try {

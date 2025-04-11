@@ -18,12 +18,15 @@ import {
   FileText,
   History,
   Thermometer,
-  Loader2
+  Loader2,
+  Download
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import useWallet from "@/hooks/useWallet"
 import { ethers } from "ethers"
+import { useQRCode } from 'next-qrcode'
 import MedicineTokenizerArtifact from "../../../../../sol_back/artifacts/contracts/MedicineNFT.sol/MedicineTokenizer.json"
+import Link from "next/link"
 
 interface MedicineData {
   tokenId: string
@@ -48,6 +51,7 @@ interface TransferHistoryItem {
 
 export default function MedicineDetailsPage({ params }: { params: { id: string } }) {
   const router = useRouter()
+  const { Canvas } = useQRCode()
   const [medicine, setMedicine] = useState<MedicineData | null>(null)
   const [transferHistory, setTransferHistory] = useState<TransferHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -460,7 +464,11 @@ export default function MedicineDetailsPage({ params }: { params: { id: string }
                           </div>
                           <div>
                             To:{" "}
-                            <span className="font-mono text-xs break-all">{transfer.to}</span>
+                            <span className="font-mono text-xs break-all">
+                              <Link href={`/medicine/user-details/${transfer.to}`}>
+                                {transfer.to}
+                              </Link>
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -479,24 +487,69 @@ export default function MedicineDetailsPage({ params }: { params: { id: string }
               <CardDescription>Related documents and certificates</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="p-6 border rounded-lg flex flex-col items-center justify-center">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-                  <FileText className="h-8 w-8" />
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="p-6 border rounded-lg flex flex-col items-center justify-center">
+                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                    <FileText className="h-8 w-8" />
+                  </div>
+                  <p className="text-center mb-4">Medicine Certificate</p>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() =>
+                      window.open(
+                        `https://ipfs.io/ipfs/${medicine.ipfsDocumentLink.replace("ipfs://", "")}`,
+                        "_blank"
+                      )
+                    }
+                  >
+                    <FileText className="h-4 w-4" />
+                    View on IPFS
+                  </Button>
                 </div>
-                <p className="text-center mb-4">Medicine Certificate</p>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2"
-                  onClick={() =>
-                    window.open(
-                      `https://ipfs.io/ipfs/${medicine.ipfsDocumentLink.replace("ipfs://", "")}`,
-                      "_blank"
-                    )
-                  }
-                >
-                  <FileText className="h-4 w-4" />
-                  View on IPFS
-                </Button>
+
+                <div className="p-6 border rounded-lg flex flex-col items-center justify-center">
+                  <div className="mb-4">
+                    <Canvas
+                      text={`https://localhost:3000/medicine/details/${medicine.tokenId}`}
+                      options={{
+                        level: 'M',
+                        margin: 3,
+                        scale: 4,
+                        width: 200,
+                      }}
+                    />
+                  </div>
+                  <p className="text-center mb-4">Medicine Verification QR Code</p>
+                  <p className="text-xs text-center text-muted-foreground mb-4">
+                    Scan to verify this medicine's authenticity
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => {
+                      // Create a canvas element and draw the QR code on it
+                      const canvas = document.createElement('canvas');
+                      const ctx = canvas.getContext('2d');
+                      const qrImg = document.querySelector('.canvas-qrcode') as HTMLCanvasElement;
+                      
+                      if (qrImg && ctx) {
+                        canvas.width = qrImg.width;
+                        canvas.height = qrImg.height;
+                        ctx.drawImage(qrImg, 0, 0);
+                        
+                        // Create a link element to trigger download
+                        const link = document.createElement('a');
+                        link.download = `medicine-${medicine.tokenId}-qr.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                      }
+                    }}
+                  >
+                    <Download className="h-4 w-4" />
+                    Download QR Code
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

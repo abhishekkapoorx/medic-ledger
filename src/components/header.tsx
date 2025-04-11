@@ -7,6 +7,7 @@ import { useInView } from "react-intersection-observer"
 import gsap from "gsap"
 import { Button } from "./ui/button"
 import ConnectWalletButton from "./ConnectWalletButton"
+import useWallet from "@/hooks/useWallet"
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -14,6 +15,8 @@ export default function Header() {
     triggerOnce: true,
     threshold: 0.1,
   })
+
+  const { isConnected } = useWallet()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,15 +80,18 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-8">
+          {isConnected && (<>
+            <Link href="/dashboard" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
+              Dashboard
+            </Link>
+          
           <Link href="/medicine" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
             Medicine
-          </Link>
-          <Link href="/prescriptions" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
-            Prescriptions
           </Link>
           <Link href="/marketplace" className="nav-item text-[#FFFAFA] hover:text-[#308E70] transition-colors">
             Marketplace
           </Link>
+          </>)}
           <ConnectWalletButton/>
         </nav>
 

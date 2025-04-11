@@ -72,7 +72,7 @@ export default function DoctorInterface() {
   // Connect wallet function
   const handleConnect = async (_provider?: ethers.BrowserProvider) => {
     if (!_provider && !provider) {
-      toast.error("MetaMask not detected! Please install MetaMask.")
+      // toast.error("MetaMask not detected! Please install MetaMask.")
       return
     }
     

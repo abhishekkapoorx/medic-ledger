@@ -144,7 +144,7 @@ export default function ManufacturerInterface() {
   // Connect wallet function
   const handleConnect = async () => {
     if (!provider) {
-      toast.error("MetaMask not detected! Please install MetaMask.");
+      // toast.error("MetaMask not detected! Please install MetaMask.");
       return;
     }
 

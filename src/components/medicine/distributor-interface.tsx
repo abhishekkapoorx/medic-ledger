@@ -451,62 +451,62 @@ export default function DistributorInterface() {
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
               ) : inventory.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Medicine</TableHead>
-                      <TableHead>Batch</TableHead>
-                      <TableHead>Storage</TableHead>
-                      <TableHead>Optimal Sell-by</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Medicine</TableHead>
+                    <TableHead>Batch</TableHead>
+                    <TableHead>Storage</TableHead>
+                    <TableHead>Optimal Sell-by</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                     {inventory.map((medicine) => {
-                      const today = new Date()
+                    const today = new Date()
                       const sellByStatus = medicine.optimalSellBy && medicine.optimalSellBy > today ? "success" : "warning"
 
-                      return (
-                        <TableRow key={medicine.tokenId}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{medicine.name}</div>
-                              <div className="text-xs text-muted-foreground">ID: {medicine.tokenId}</div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div>
-                              <div>{medicine.batchNumber}</div>
-                              <div className="flex items-center text-xs text-muted-foreground">
-                                <Calendar className="h-3 w-3 mr-1" />
+                    return (
+                      <TableRow key={medicine.tokenId}>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{medicine.name}</div>
+                            <div className="text-xs text-muted-foreground">ID: {medicine.tokenId}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div>{medicine.batchNumber}</div>
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              <Calendar className="h-3 w-3 mr-1" />
                                 {medicine.acquisitionDate 
                                   ? format(medicine.acquisitionDate, "MMM d, yyyy")
                                   : format(medicine.manufactureDate, "MMM d, yyyy") }
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <Thermometer className="h-4 w-4 mr-1 text-green-500" />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Thermometer className="h-4 w-4 mr-1 text-green-500" />
                               {medicine.storageTemp || medicine.storageConditions}
-                            </div>
-                          </TableCell>
-                          <TableCell>
+                          </div>
+                        </TableCell>
+                        <TableCell>
                             {medicine.optimalSellBy && (
-                              <Badge variant={sellByStatus === "success" ? "outline" : "secondary"}>
-                                {format(medicine.optimalSellBy, "MMM d, yyyy")}
-                              </Badge>
+                          <Badge variant={sellByStatus === "success" ? "outline" : "secondary"}>
+                            {format(medicine.optimalSellBy, "MMM d, yyyy")}
+                          </Badge>
                             )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
                               <Button 
                                 variant="outline" 
                                 size="sm"
                                 onClick={() => window.open(`https://gateway.pinata.cloud/ipfs/${medicine.ipfsHash}`, '_blank')}
                               >
-                                View
-                              </Button>
+                              View
+                            </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm"
@@ -528,15 +528,15 @@ export default function DistributorInterface() {
                                   }
                                 }}
                               >
-                                Sell
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
+                              Sell
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
               ) : (
                 <div className="text-center p-8 border rounded-lg">
                   <p>No medicines found in your inventory.</p>
