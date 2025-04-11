@@ -36,6 +36,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 // Import contract ABIs
 import MedicineTokenizerArtifact from "../../../sol_back/artifacts/contracts/MedicineNFT.sol/MedicineTokenizer.json"
 import PharmacyMarketplaceArtifact from "../../../sol_back/artifacts/contracts/MarketPlace.sol/PharmacyMarketplace.json"
+import Link from "next/link"
 
 // Environment variables for contract addresses
 const MEDICINE_NFT_ADDRESS = process.env.NEXT_PUBLIC_MEDICINE_NFT_ADDRESS || "0x43ca3D2C94be00692D207C6A1e60D8B325c6f12f";
@@ -365,6 +366,8 @@ export default function ManufacturerInterface() {
           continue;
         }
       }
+
+      console.log("setting minted medicines", medicines);
       
       setMintedMedicines(medicines);
       
@@ -1002,9 +1005,9 @@ export default function ManufacturerInterface() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => window.open(`https://gateway.pinata.cloud/ipfs/${medicine.ipfsHash}`, '_blank')}
+                              // onClick={() => window.open(`https://gateway.pinata.cloud/ipfs/${medicine.ipfsHash}`, '_blank')}
                             >
-                              View
+                              <Link href={`/medicine/details/${medicine.tokenId}`}>View</Link>
                             </Button>
                             <Button
                               variant="outline"

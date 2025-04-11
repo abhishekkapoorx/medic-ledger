@@ -73,6 +73,12 @@ export const requestAccounts = async (): Promise<string[]> => {
  */
 export const initializeContracts = (signer: ethers.Signer) => {
   try {
+    console.log("Initializing contracts with signer:", signer);
+    
+    // Log the artifacts to ensure they're loaded correctly
+    console.log("MedicineTokenizer ABI loaded:", 
+      MedicineTokenizerArtifact && MedicineTokenizerArtifact.abi ? "Yes" : "No");
+    
     const medicineContract = new ethers.Contract(
       MEDICINE_NFT_ADDRESS,
       MedicineTokenizerArtifact.abi,
@@ -90,6 +96,22 @@ export const initializeContracts = (signer: ethers.Signer) => {
       UserRegistryArtifact.abi,
       signer
     );
+    
+    console.log("Medicine contract initialized at:", MEDICINE_NFT_ADDRESS);
+    
+    // Log available functions to help with debugging
+    if (medicineContract.interface) {
+      try {
+        // Get function signatures from the interface
+        const functionSignatures = Object.values(medicineContract.interface.fragments)
+          .filter(fragment => fragment.type === 'function')
+          .map(fragment => fragment.format());
+        
+        console.log("Medicine contract functions:", functionSignatures);
+      } catch (err) {
+        console.log("Could not list contract functions:", err);
+      }
+    }
     
     return { medicineContract, marketplaceContract, userRegistryContract };
   } catch (error) {
