@@ -28,6 +28,7 @@ export default function MedicineHome() {
         case "0":
           setUserInterface(<PatientInterface />)
           break
+        case "3":
         case "4":
           setUserInterface(<DistributorInterface />)
           break
@@ -36,7 +37,7 @@ export default function MedicineHome() {
           break
         default:
           // Default to manufacturer if role is not recognized
-          setUserInterface(<ManufacturerInterface />)
+          setUserInterface(<PatientInterface />)
       }
     } else {
       // If no role is set, default to manufacturer interface

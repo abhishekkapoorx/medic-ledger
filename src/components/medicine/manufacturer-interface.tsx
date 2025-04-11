@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils"
 import { ethers } from "ethers"
 import toast from "react-hot-toast"
 import axios from "axios"
+import { Checkbox } from "@/components/ui/checkbox"
 
 // Import contract ABIs
 import MedicineTokenizerArtifact from "../../../sol_back/artifacts/contracts/MedicineNFT.sol/MedicineTokenizer.json"
@@ -103,6 +104,9 @@ export default function ManufacturerInterface() {
   // New state for medicine history
   const [selectedMedicineForHistory, setSelectedMedicineForHistory] = useState<Medicine | null>(null);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+
+  // New state for donation
+  const [isDonation, setIsDonation] = useState(false);
 
   // Initialize provider on component mount
   useEffect(() => {
@@ -204,17 +208,25 @@ export default function ManufacturerInterface() {
       return;
     }
     
-    // Validate price
-    if (!listingPrice || parseFloat(listingPrice) <= 0) {
+    // Validate price unless it's a donation
+    if (!isDonation && (!listingPrice || parseFloat(listingPrice) <= 0)) {
       toast.error("Please enter a valid price");
       return;
     }
     
     setIsListing(true);
     try {
-      // Convert price to wei
-      const priceInWei = ethers.parseEther(listingPrice);
+      // Convert price to wei (0 for donations)
+      const priceInWei = isDonation ? ethers.parseEther("0") : ethers.parseEther(listingPrice);
       const tokenId = selectedMedicine;
+      
+      // First verify the user owns this medicine
+      const owner = await medicineContract!.ownerOf(tokenId);
+      if (owner.toLowerCase() !== connectedAccount.toLowerCase()) {
+        toast.error("You are not the owner of this medicine");
+        setIsListing(false);
+        return;
+      }
       
       // Check if medicine contract is approved for marketplace
       const isApproved = await medicineContract!.isApprovedForAll(
@@ -236,37 +248,58 @@ export default function ManufacturerInterface() {
       
       // List the medicine
       toast.loading("Listing medicine on marketplace...");
-      const tx = await marketplaceContract.listMedicine(tokenId, priceInWei);
-      const receipt = await tx.wait();
-      toast.dismiss();
+      let tx;
+      try {
+        tx = await marketplaceContract.listMedicine(tokenId, priceInWei);
+      } catch (error: any) {
+        toast.dismiss();
+        console.error("Transaction failed:", error);
+        throw new Error(error.reason || error.message || "Failed to submit transaction");
+      }
       
-      if (receipt.status === 1) {
-        // Wait a moment for the blockchain to update
-        await new Promise(resolve => setTimeout(resolve, 2000));
+      try {
+        const receipt = await tx.wait();
+        toast.dismiss();
         
-        // Verify the listing was actually created on the contract
-        const isListed = await verifyListingStatus(tokenId);
-        
-        if (isListed) {
-          toast.success(`Medicine #${tokenId} listed for ${listingPrice} ETH`);
+        if (receipt.status === 1) {
+          // Wait a moment for the blockchain to update
+          await new Promise(resolve => setTimeout(resolve, 2000));
           
-          // Update the medicine's listing status in the state
-          setMintedMedicines(prevMedicines => 
-            prevMedicines.map(medicine => 
-              medicine.tokenId === tokenId 
-                ? { ...medicine, isListed: true, listingPrice: listingPrice }
-                : medicine
-            )
-          );
+          // Verify the listing was actually created on the contract
+          const isListed = await verifyListingStatus(tokenId);
           
-          // Reset form
-          setSelectedMedicine(null);
-          setListingPrice("");
+          if (isListed) {
+            const message = isDonation 
+              ? `Medicine #${tokenId} listed for donation` 
+              : `Medicine #${tokenId} listed for ${listingPrice} ETH`;
+            toast.success(message);
+            
+            // Update the medicine's listing status in the state
+            setMintedMedicines(prevMedicines => 
+              prevMedicines.map(medicine => 
+                medicine.tokenId === tokenId 
+                  ? { 
+                      ...medicine, 
+                      isListed: true, 
+                      listingPrice: isDonation ? "0" : listingPrice 
+                    }
+                  : medicine
+              )
+            );
+            
+            // Reset form
+            setSelectedMedicine(null);
+            setListingPrice("");
+            setIsDonation(false);
+          } else {
+            throw new Error("Listing verification failed - please refresh the page to check listing status");
+          }
         } else {
-          throw new Error("Listing verification failed - please refresh the page to check listing status");
+          throw new Error("Transaction failed");
         }
-      } else {
-        throw new Error("Transaction failed");
+      } catch (error: any) {
+        console.error("Transaction confirmation failed:", error);
+        throw new Error(error.reason || error.message || "Transaction failed during confirmation");
       }
       
     } catch (error: any) {
@@ -661,6 +694,96 @@ export default function ManufacturerInterface() {
     }
   };
 
+  // Donate medicine directly to a patient (for distributors)
+  const handleDonateMedicine = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!marketplaceContract || !signer || !selectedMedicineForTransfer || !recipientAddress) {
+      toast.error("Please connect wallet, select a medicine, and provide a recipient address");
+      return;
+    }
+    
+    setIsTransferring(true);
+    try {
+      // Validate recipient address
+      if (!ethers.isAddress(recipientAddress)) {
+        toast.error("Invalid recipient address");
+        setIsTransferring(false);
+        return;
+      }
+      
+      const tokenId = selectedMedicineForTransfer;
+      
+      // First verify the user owns this medicine
+      const owner = await medicineContract!.ownerOf(tokenId);
+      if (owner.toLowerCase() !== connectedAccount.toLowerCase()) {
+        toast.error("You are not the owner of this medicine");
+        setIsTransferring(false);
+        return;
+      }
+      
+      // Check if medicine contract is approved for marketplace
+      const isApproved = await medicineContract!.isApprovedForAll(
+        connectedAccount,
+        MARKETPLACE_ADDRESS
+      );
+      
+      // If not approved, request approval first
+      if (!isApproved) {
+        toast.loading("Approving marketplace to transfer medicines...");
+        const approveTx = await medicineContract!.setApprovalForAll(
+          MARKETPLACE_ADDRESS,
+          true
+        );
+        await approveTx.wait();
+        toast.dismiss();
+        toast.success("Marketplace approved successfully!");
+      }
+      
+      // First list the medicine as a donation
+      toast.loading("Listing medicine as donation...");
+      const listTx = await marketplaceContract.listMedicine(
+        tokenId, 
+        ethers.parseEther("0") // 0 price for donations
+      );
+      await listTx.wait();
+      toast.dismiss();
+      
+      // Then donate it to the recipient
+      toast.loading("Donating medicine to recipient...");
+      const donateTx = await marketplaceContract.donateMedicine(
+        tokenId,
+        recipientAddress,
+        0 // 0 for no prescription ID
+      );
+      
+      const receipt = await donateTx.wait();
+      toast.dismiss();
+      
+      if (receipt.status === 1) {
+        toast.success(`Medicine #${tokenId} successfully donated to ${recipientAddress}`);
+        
+        // Update local state
+        setMintedMedicines(prevMedicines => 
+          prevMedicines.filter(medicine => medicine.tokenId !== tokenId)
+        );
+        
+        // Reset form
+        setSelectedMedicineForTransfer(null);
+        setRecipientAddress("");
+      } else {
+        throw new Error("Donation transaction failed");
+      }
+      
+    } catch (error: any) {
+      console.error("Donation failed:", error);
+      toast.dismiss();
+      toast.error(error.reason || error.message || "Failed to donate medicine");
+    } finally {
+      setIsTransferring(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Manufacturer Dashboard</h1>
@@ -712,7 +835,7 @@ export default function ManufacturerInterface() {
               onClick={() => setActiveTab("transfer")} 
               variant={activeTab === "transfer" ? "default" : "outline"}
             >
-              Direct Transfer
+              Transfer/Donate
             </Button>
           </div>
         </div>
@@ -974,21 +1097,33 @@ export default function ManufacturerInterface() {
                       placeholder="0.00"
                       value={listingPrice}
                       onChange={(e) => setListingPrice(e.target.value)}
-                      disabled={isListing}
+                      disabled={isListing || isDonation}
                     />
                   </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="isDonation" 
+                    checked={isDonation} 
+                    onCheckedChange={(checked) => setIsDonation(checked === true)}
+                    disabled={isListing}
+                  />
+                  <Label htmlFor="isDonation">List as donation (price will be set to 0)</Label>
                 </div>
 
                 <Button 
                   type="submit" 
                   className="w-full"
-                  disabled={!selectedMedicine || !listingPrice || isListing}
+                  disabled={!selectedMedicine || (!isDonation && !listingPrice) || isListing}
                 >
                   {isListing ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Listing...
                     </>
+                  ) : isDonation ? (
+                    'List as Donation'
                   ) : (
                     'List for Sale'
                   )}
@@ -1094,20 +1229,38 @@ export default function ManufacturerInterface() {
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  disabled={!selectedMedicineForTransfer || !recipientAddress || isTransferring}
-                >
-                  {isTransferring ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Transferring...
-                    </>
-                  ) : (
-                    'Transfer Medicine NFT'
-                  )}
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    type="submit" 
+                    className="flex-1"
+                    disabled={!selectedMedicineForTransfer || !recipientAddress || isTransferring}
+                  >
+                    {isTransferring ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Transferring...
+                      </>
+                    ) : (
+                      'Transfer Medicine'
+                    )}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    className="flex-1"
+                    variant="secondary"
+                    onClick={handleDonateMedicine}
+                    disabled={!selectedMedicineForTransfer || !recipientAddress || isTransferring}
+                  >
+                    {isTransferring ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Donating...
+                      </>
+                    ) : (
+                      'Donate Medicine'
+                    )}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
