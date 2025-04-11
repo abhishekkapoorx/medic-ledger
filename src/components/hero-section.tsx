@@ -109,7 +109,7 @@ export default function HeroSection() {
           <div className="hero-buttons flex flex-wrap gap-4">
             <ConnectWalletButton />
 
-            { userData && userData.isActive ? (
+            {/* { userData && userData.isActive ? (
               <Link
               href="/dashboard"
               className="border border-[#FFFAFA]/30 text-[#FFFAFA] px-6 py-3 rounded-md hover:bg-[#FFFAFA]/10 transition-all"
@@ -123,7 +123,7 @@ export default function HeroSection() {
             >
               Register
             </Link>
-            )}
+            )} */}
             
             
           </div>

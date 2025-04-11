@@ -1,36 +1,157 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MedicLedger
+
+MedicLedger is a blockchain-based platform for pharmaceutical supply chain management, prescription tracking, and medical record verification. The system connects patients, doctors, manufacturers, distributors, and retailers in a secure, transparent network built on Ethereum blockchain technology.
+
+## Project Structure
+
+The project consists of two main components:
+- **Next.js Frontend**: User interface and client-side application
+- **Hardhat Blockchain**: Smart contracts and blockchain infrastructure
+
+## Features
+
+- User authentication with blockchain wallet integration
+- Medical professional verification system
+- Pharmaceutical supply chain tracking
+- Digital prescription management
+- Medical record verification using IPFS
+- Medicine marketplace
+- Dashboard analytics for all user roles
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [MetaMask](https://metamask.io/) or similar Ethereum wallet browser extension
 
 ## Getting Started
 
-First, run the development server:
+### Frontend Setup (Next.js)
 
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd medic-ledger
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to access the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Blockchain Setup (Hardhat)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Navigate to the blockchain directory:
+```bash
+cd sol_back
+```
 
-## Learn More
+2. Install blockchain dependencies:
+```bash
+npm install
+# or
+yarn install
+```
 
-To learn more about Next.js, take a look at the following resources:
+3. Compile smart contracts:
+```bash
+npx hardhat compile
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Start a local blockchain node:
+```bash
+npx hardhat node
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Deploy smart contracts to the local node (in a new terminal):
+```bash
+npx hardhat run scripts/deploy.ts --network localhost
+```
 
-## Deploy on Vercel
+### Connecting Frontend to Blockchain
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Connect MetaMask to your local Hardhat network:
+   - Network Name: `Hardhat Local`
+   - RPC URL: `http://127.0.0.1:8545`
+   - Chain ID: `1337`
+   - Currency Symbol: `ETH`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. Import test accounts using private keys provided by Hardhat node (shown in terminal output).
+
+## Smart Contracts
+
+The project includes the following key smart contracts:
+
+- `UserRegistry.sol`: Manages user registration and role management
+- `MedicineNFT.sol`: Handles medicine tracking as non-fungible tokens
+- `PrescriptionNFT.sol`: Manages digital prescriptions as NFTs
+- `MarketPlace.sol`: Facilitates medicine sales and transfers
+
+## Hardhat Commands
+
+```bash
+# Compile contracts
+npx hardhat compile
+
+# Run tests
+npx hardhat test
+
+# Start local blockchain node
+npx hardhat node
+
+# Deploy contracts to local network
+npx hardhat run scripts/deploy.ts --network localhost
+
+# Deploy contracts to a testnet (configure network in hardhat.config.ts first)
+npx hardhat run scripts/deploy.ts --network [network-name]
+
+# Verify contract on Etherscan (after deployment to public network)
+npx hardhat verify --network [network-name] [contract-address] [constructor-arguments]
+```
+
+## IPFS Integration
+
+Medical documents and licenses are stored on IPFS with Pinata gateway integration. Files can be accessed via the following URL pattern:
+```
+https://gateway.pinata.cloud/ipfs/[hash]
+```
+
+## Environment Setup
+
+Create a `.env` file in both the root directory and `sol_back` directory for environment configurations:
+
+Root `.env`:
+```
+NEXT_PUBLIC_CONTRACT_ADDRESS=0x...
+NEXT_PUBLIC_PINATA_API_KEY=
+NEXT_PUBLIC_PINATA_SECRET_KEY=
+```
+
+`sol_back/.env`:
+```
+ETHERSCAN_API_KEY=
+PRIVATE_KEY=
+```
+
+## Contributing
+
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
