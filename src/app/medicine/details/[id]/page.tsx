@@ -5,40 +5,182 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, AlertTriangle, ArrowLeft, FileText, History, Thermometer } from "lucide-react"
+import { CheckCircle, AlertTriangle, ArrowLeft, FileText, History, Thermometer, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import useWallet from "@/hooks/useWallet"
+import { ethers } from "ethers"
 
-// Mock data for demonstration
-const mockMedicineDetails = {
-  tokenId: "123",
-  name: "Paracetamol",
-  batchNumber: "BATCH001",
-  manufactureDate: new Date("2023-01-15"),
-  expiryDate: new Date("2025-01-15"),
-  isExpired: false,
-  manufacturer: "PharmaCorp Inc.",
-  manufacturerAddress: "0xABCD...1234",
-  currentOwner: "0x1234...5678",
-  composition: "Paracetamol 500mg",
-  storageRequirements: "Store below 25°C in a dry place",
-  ipfsDocumentLink: "ipfs://QmXyZ...",
-  transferHistory: [
-    { from: "0xManufacturer", to: "0xDistributor", date: new Date("2023-01-15"), role: "Manufacturer" },
-    { from: "0xDistributor", to: "0xRetailer", date: new Date("2023-02-01"), role: "Distributor" },
-    { from: "0xRetailer", to: "0xPatient", date: new Date("2023-03-01"), role: "Retailer" },
-  ],
+interface MedicineData {
+  tokenId: string;
+  name: string;
+  batchNumber: string;
+  manufactureDate: Date;
+  expiryDate: Date;
+  isExpired: boolean;
+  manufacturer: string;
+  currentOwner: string;
+  composition: string;
+  storageRequirements: string;
+  ipfsDocumentLink: string;
+}
+
+interface OwnershipRecord {
+  owner: string;
+  timestamp: number;
+}
+
+interface TransferHistoryItem {
+  from: string;
+  to: string;
+  date: Date;
+  role: string;
 }
 
 export default function MedicineDetailsPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const [medicine, setMedicine] = useState(mockMedicineDetails)
+  const [medicine, setMedicine] = useState<MedicineData | null>(null)
+  const [transferHistory, setTransferHistory] = useState<TransferHistoryItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  
+  // Use the wallet hook instead of Redux selector
+  const { contracts, isConnected } = useWallet()
 
-  // In a real app, this would fetch the medicine details from the blockchain
+  // Fetch medicine details from blockchain
   useEffect(() => {
-    // Fetch medicine details using params.id
-    console.log(`Fetching medicine with ID: ${params.id}`)
-    // For demo, we're using mock data
-  }, [params.id])
+    const fetchMedicineDetails = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        if (!isConnected) {
+          throw new Error("Wallet not connected. Please connect your wallet to view medicine details.")
+        }
+        
+        if (!contracts.medicineContract) {
+          throw new Error("Medicine contract not initialized. Please connect your wallet.")
+        }
+        
+        const tokenId = params.id
+        
+        // Fetch medicine details
+        const medicineDetails = await contracts.medicineContract.getMedicineDetails(tokenId)
+        
+        // Fetch ownership history
+        const ownershipHistory: OwnershipRecord[] = await contracts.medicineContract.getOwnershipHistory(tokenId)
+        
+        // Process medicine details
+        const now = new Date()
+        const expiryDate = new Date(Number(medicineDetails.expiryDate) * 1000)
+        const manufactureDate = new Date(Number(medicineDetails.manufactureDate) * 1000)
+        
+        setMedicine({
+          tokenId,
+          name: medicineDetails.name,
+          batchNumber: medicineDetails.batchNumber,
+          manufactureDate,
+          expiryDate,
+          isExpired: now > expiryDate,
+          manufacturer: medicineDetails.manufacturer,
+          currentOwner: medicineDetails.currentOwner,
+          composition: medicineDetails.composition,
+          storageRequirements: medicineDetails.storageConditions,
+          ipfsDocumentLink: `ipfs://${medicineDetails.ipfsHash}`
+        })
+        
+        // Process ownership history into transfer history
+        if (ownershipHistory.length > 0) {
+          const historyItems: TransferHistoryItem[] = []
+          
+          // For the first entry, we use manufacturer as "from"
+          historyItems.push({
+            from: "Manufacturer",
+            to: ownershipHistory[0].owner,
+            date: new Date(Number(ownershipHistory[0].timestamp) * 1000),
+            role: "Manufacturer"
+          })
+          
+          // Process subsequent transfers
+          for (let i = 1; i < ownershipHistory.length; i++) {
+            historyItems.push({
+              from: ownershipHistory[i-1].owner,
+              to: ownershipHistory[i].owner,
+              date: new Date(Number(ownershipHistory[i].timestamp) * 1000),
+              // Simplified role assignment - in production you'd query the user registry contract
+              role: i === 1 ? "Distributor" : i === 2 ? "Retailer" : "Consumer"
+            })
+          }
+          
+          setTransferHistory(historyItems)
+        }
+      } catch (err: any) {
+        console.error("Error fetching medicine details:", err)
+        setError(err.message || "Failed to fetch medicine details")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (params.id) {
+      fetchMedicineDetails()
+    }
+  }, [params.id, contracts.medicineContract, isConnected])
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+        <p>Loading medicine details...</p>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-6 flex items-center">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-700">Error Loading Medicine</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-red-700">{error}</p>
+            <Button variant="outline" className="mt-4" onClick={() => router.back()}>
+              Go Back
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // No medicine found
+  if (!medicine) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-6 flex items-center">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle>Medicine Not Found</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>The medicine with ID {params.id} could not be found.</p>
+            <Button variant="outline" className="mt-4" onClick={() => router.back()}>
+              Go Back
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -95,10 +237,10 @@ export default function MedicineDetailsPage({ params }: { params: { id: string }
                   <span>{medicine.expiryDate.toLocaleDateString()}</span>
 
                   <span className="font-medium">Manufacturer:</span>
-                  <span>{medicine.manufacturer}</span>
+                  <span className="font-mono text-xs break-all">{medicine.manufacturer}</span>
 
                   <span className="font-medium">Current Owner:</span>
-                  <span className="font-mono">{medicine.currentOwner}</span>
+                  <span className="font-mono text-xs break-all">{medicine.currentOwner}</span>
                 </div>
               </CardContent>
             </Card>
@@ -135,31 +277,35 @@ export default function MedicineDetailsPage({ params }: { params: { id: string }
               <CardDescription>Complete ownership chain of this medicine</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="relative pl-6 border-l-2 border-dashed border-muted-foreground/30 space-y-8">
-                {medicine.transferHistory.map((transfer, index) => (
-                  <div key={index} className="relative">
-                    <div className="absolute -left-[25px] w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <History className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="pl-6">
-                      <div className="flex items-center">
-                        <Badge variant="outline" className="mr-2">
-                          {transfer.role}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">{transfer.date.toLocaleDateString()}</span>
+              {transferHistory.length === 0 ? (
+                <p className="text-center text-muted-foreground py-6">No transfer history available</p>
+              ) : (
+                <div className="relative pl-6 border-l-2 border-dashed border-muted-foreground/30 space-y-8">
+                  {transferHistory.map((transfer, index) => (
+                    <div key={index} className="relative">
+                      <div className="absolute -left-[25px] w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <History className="h-5 w-5 text-primary" />
                       </div>
-                      <div className="mt-2 text-sm">
-                        <div>
-                          From: <span className="font-mono">{transfer.from}</span>
+                      <div className="pl-6">
+                        <div className="flex items-center">
+                          <Badge variant="outline" className="mr-2">
+                            {transfer.role}
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">{transfer.date.toLocaleDateString()}</span>
                         </div>
-                        <div>
-                          To: <span className="font-mono">{transfer.to}</span>
+                        <div className="mt-2 text-sm">
+                          <div>
+                            From: <span className="font-mono text-xs break-all">{transfer.from}</span>
+                          </div>
+                          <div>
+                            To: <span className="font-mono text-xs break-all">{transfer.to}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -176,7 +322,8 @@ export default function MedicineDetailsPage({ params }: { params: { id: string }
                   <FileText className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <p className="text-center mb-4">Medicine Certificate</p>
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button variant="outline" className="flex items-center gap-2" 
+                  onClick={() => window.open(`https://ipfs.io/ipfs/${medicine.ipfsDocumentLink.replace('ipfs://', '')}`, '_blank')}>
                   <FileText className="h-4 w-4" />
                   View on IPFS
                 </Button>

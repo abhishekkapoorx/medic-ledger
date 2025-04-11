@@ -22,6 +22,8 @@ import { format } from "date-fns"
 import { Thermometer, Calendar, Loader2, History, Tag, ArrowRight } from "lucide-react"
 import { ethers } from "ethers"
 import toast from "react-hot-toast"
+import useWallet from "@/hooks/useWallet"
+import { formatAddress } from "@/utils/blockchain"
 
 // Import contract ABIs
 import MedicineTokenizerArtifact from "../../../sol_back/artifacts/contracts/MedicineNFT.sol/MedicineTokenizer.json"
@@ -65,96 +67,27 @@ export default function DistributorInterface() {
   const [isLoading, setIsLoading] = useState(false)
   const [isTransferring, setIsTransferring] = useState(false)
   
-  // Blockchain connection states
-  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null)
-  const [signer, setSigner] = useState<ethers.Signer | null>(null)
-  const [medicineContract, setMedicineContract] = useState<ethers.Contract | null>(null)
-  const [marketplaceContract, setMarketplaceContract] = useState<ethers.Contract | null>(null)
-  const [connectedAccount, setConnectedAccount] = useState<string>("")
-  const [isConnected, setIsConnected] = useState(false)
+  // Use the wallet hook instead of local state
+  const { account, contracts, isConnected } = useWallet()
   
   // State for medicine history
   const [selectedMedicineForHistory, setSelectedMedicineForHistory] = useState<Medicine | null>(null)
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false)
 
-  // Initialize provider on component mount
-  useEffect(() => {
-    if (window.ethereum) {
-      const _provider = new ethers.BrowserProvider(window.ethereum as any);
-      setProvider(_provider);
-
-      // Set up event listener for account changes
-      window.ethereum.on('accountsChanged', (accounts: string[]) => {
-        if (accounts.length > 0) {
-          handleConnect();
-        } else {
-          setIsConnected(false);
-          setConnectedAccount("");
-        }
-      });
-
-      // Check if already connected
-      _provider.listAccounts().then(accounts => {
-        if (accounts.length > 0) {
-          handleConnect();
-        }
-      }).catch(err => console.error("Failed to check accounts:", err));
-    }
-  }, []);
-
   // Load inventory when connected
   useEffect(() => {
-    if (isConnected && medicineContract && connectedAccount) {
+    if (isConnected && contracts.medicineContract && account) {
       fetchInventory();
     }
-  }, [isConnected, medicineContract, connectedAccount]);
-
-  // Connect wallet function
-  const handleConnect = async () => {
-    if (!provider) {
-      toast.error("MetaMask not detected! Please install MetaMask.");
-      return;
-    }
-
-    try {
-      // Request account access
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const _signer = await provider.getSigner();
-      setSigner(_signer);
-      setConnectedAccount(accounts[0]);
-      setIsConnected(true);
-
-      // Initialize medicine contract
-      const _medicineContract = new ethers.Contract(
-        MEDICINE_NFT_ADDRESS,
-        MedicineTokenizerArtifact.abi,
-        _signer
-      );
-      setMedicineContract(_medicineContract);
-      
-      // Initialize marketplace contract
-      const _marketplaceContract = new ethers.Contract(
-        MARKETPLACE_ADDRESS,
-        PharmacyMarketplaceArtifact.abi,
-        _signer
-      );
-      setMarketplaceContract(_marketplaceContract);
-
-      toast.success("Wallet connected successfully!");
-
-    } catch (error: any) {
-      console.error("Connection failed:", error);
-      toast.error(error.message || "Failed to connect wallet");
-    }
-  };
+  }, [isConnected, contracts.medicineContract, account]);
 
   // Fetch medicine history
   const fetchMedicineHistory = async (tokenId: string) => {
-    if (!medicineContract || !provider) return [];
+    if (!contracts.medicineContract) return [];
     
     try {
       // Get ownership history directly from the contract's new function
-      const ownershipRecords = await medicineContract.getOwnershipHistory(parseInt(tokenId));
+      const ownershipRecords = await contracts.medicineContract.getOwnershipHistory(parseInt(tokenId));
       
       // Format ownership records
       const history: OwnershipRecord[] = [];
@@ -171,7 +104,7 @@ export default function DistributorInterface() {
         }
       } else {
         // Fallback to fetching basic details if history isn't available
-        const medicineDetails = await medicineContract.getMedicineDetails(parseInt(tokenId));
+        const medicineDetails = await contracts.medicineContract.getMedicineDetails(parseInt(tokenId));
         
         // Add manufacturer as the first owner
         history.push({
@@ -196,7 +129,7 @@ export default function DistributorInterface() {
       
       // Fallback to basic details if the new function fails
       try {
-        const medicineDetails = await medicineContract.getMedicineDetails(parseInt(tokenId));
+        const medicineDetails = await contracts.medicineContract.getMedicineDetails(parseInt(tokenId));
         const history: OwnershipRecord[] = [];
         
         history.push({
@@ -249,11 +182,11 @@ export default function DistributorInterface() {
 
   // Fetch distributor's inventory
   const fetchInventory = async () => {
-    if (!medicineContract || !connectedAccount) return;
+    if (!contracts.medicineContract || !account) return;
 
     setIsLoading(true);
     try {
-      const nextTokenId = await medicineContract.getNextTokenId?.() || 0;
+      const nextTokenId = await contracts.medicineContract.getNextTokenId?.() || 0;
       const medicines: Medicine[] = [];
       
       // Check the last 50 tokens (adjust the range as needed)
@@ -261,11 +194,11 @@ export default function DistributorInterface() {
       
       for (let i = startId; i < Number(nextTokenId); i++) {
         try {
-          const owner = await medicineContract.ownerOf(i);
+          const owner = await contracts.medicineContract.ownerOf(i);
           
           // Only include medicines owned by the connected distributor
-          if (owner.toLowerCase() === connectedAccount.toLowerCase()) {
-            const details = await medicineContract.getMedicineDetails(i);
+          if (owner.toLowerCase() === account.toLowerCase()) {
+            const details = await contracts.medicineContract.getMedicineDetails(i);
             
             // Get the ownership history to determine acquisition date
             const history = await fetchMedicineHistory(i.toString());
@@ -275,7 +208,7 @@ export default function DistributorInterface() {
             if (history.length > 1) {
               // The most recent transfer to this distributor
               const transferToDistributor = history.findLast(
-                (record) => record.owner.toLowerCase() === connectedAccount.toLowerCase()
+                (record) => record.owner.toLowerCase() === account.toLowerCase()
               );
               
               if (transferToDistributor) {
@@ -336,7 +269,7 @@ export default function DistributorInterface() {
   const handleTransferMedicine = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!medicineContract || !signer || !selectedMedicine) {
+    if (!contracts.medicineContract || !account || !selectedMedicine) {
       toast.error("Please connect wallet and select a medicine");
       return;
     }
@@ -353,8 +286,8 @@ export default function DistributorInterface() {
       const tokenId = selectedMedicine;
       
       toast.loading("Transferring medicine NFT...");
-      const tx = await medicineContract["safeTransferFrom(address,address,uint256)"](
-        connectedAccount,
+      const tx = await contracts.medicineContract["safeTransferFrom(address,address,uint256)"](
+        account,
         buyerAddress,
         tokenId
       );
@@ -388,41 +321,26 @@ export default function DistributorInterface() {
     }
   };
 
-  // Format address for display
-  const formatAddress = (address: string) => {
-    if (!address) return "";
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
   return (
     <div className="space-y-8">
-      {!isConnected ? (
-        <div className="flex flex-col items-center justify-center p-8 mb-6 border rounded-lg">
-          <h2 className="text-xl mb-4">Connect your wallet to access Distributor features</h2>
-          <Button onClick={handleConnect} className="w-full md:w-auto">
-            Connect Wallet
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <span className="font-medium">Connected Account: </span>
+          <span className="text-sm bg-neutral-100 dark:bg-neutral-800 p-2 rounded">{formatAddress(account || "")}</span>
+        </div>
+        <div className="space-x-2">
+          <Button onClick={fetchInventory} variant="outline" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              'Refresh'
+            )}
           </Button>
         </div>
-      ) : (
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <span className="font-medium">Connected Account: </span>
-            <span className="text-sm bg-neutral-100 dark:bg-neutral-800 p-2 rounded">{formatAddress(connectedAccount)}</span>
-          </div>
-          <div className="space-x-2">
-            <Button onClick={fetchInventory} variant="outline" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                'Refresh'
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
+      </div>
       
       <Tabs defaultValue="inventory" className="w-full">
         <TabsList className="grid grid-cols-2 mb-4">

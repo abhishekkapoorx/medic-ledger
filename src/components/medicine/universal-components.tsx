@@ -4,13 +4,18 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { QrCode, Scan, AlertTriangle, CheckCircle } from "lucide-react"
+import { QrCode, Scan, AlertTriangle, CheckCircle, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import useWallet from "@/hooks/useWallet"
+import toast from "react-hot-toast"
 
 export default function UniversalComponents() {
   const [qrValue, setQrValue] = useState("")
   const [scanResult, setScanResult] = useState<null | { isAuthentic: boolean; message: string }>(null)
+  const [medicineId, setMedicineId] = useState("")
+  const [isSearching, setIsSearching] = useState(false)
   const router = useRouter()
+  const { contracts, isConnected } = useWallet()
 
   const handleScan = () => {
     // Mock scan result - in a real app, this would use a QR scanner
@@ -28,6 +33,32 @@ export default function UniversalComponents() {
   const handleViewDetails = () => {
     // Navigate to medicine details page
     router.push("/medicine/details/123")
+  }
+
+  const handleSearch = async () => {
+    if (!medicineId) {
+      toast.error("Please enter a medicine ID")
+      return
+    }
+
+    if (!isConnected || !contracts.medicineContract) {
+      toast.error("Please connect your wallet first")
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      // Check if medicine exists by trying to get its owner
+      await contracts.medicineContract.ownerOf(medicineId)
+      
+      // If it exists, navigate to the medicine details page
+      router.push(`/medicine/details/${medicineId}`)
+    } catch (error: any) {
+      console.error("Error searching for medicine:", error)
+      toast.error("Medicine not found or invalid ID")
+    } finally {
+      setIsSearching(false)
+    }
   }
 
   return (
@@ -93,12 +124,25 @@ export default function UniversalComponents() {
       <Card>
         <CardHeader>
           <CardTitle>Medicine Lookup</CardTitle>
-          <CardDescription>Find medicine details by address or token ID</CardDescription>
+          <CardDescription>Find medicine details by token ID</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex space-x-2">
-            <Input placeholder="Enter medicine address or token ID" />
-            <Button>Search</Button>
+            <Input 
+              placeholder="Enter medicine token ID" 
+              value={medicineId}
+              onChange={(e) => setMedicineId(e.target.value)}
+            />
+            <Button onClick={handleSearch} disabled={isSearching}>
+              {isSearching ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                'Search'
+              )}
+            </Button>
           </div>
 
           <div className="p-6 border rounded-lg flex flex-col items-center justify-center">
@@ -106,7 +150,7 @@ export default function UniversalComponents() {
               <Scan className="h-8 w-8 text-muted-foreground" />
             </div>
             <p className="text-sm text-center text-muted-foreground">
-              Enter a medicine address or token ID to view its complete details
+              Enter a medicine token ID to view its complete details
             </p>
           </div>
 
