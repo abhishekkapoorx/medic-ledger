@@ -152,6 +152,9 @@ PRIVATE_KEY=
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## Contributors
+[![contributors](https://contrib.rocks/image?repo=abhishekkapoorx/medic-ledger&max=2000)](https://github.com/abhishekkapoorx/medic-ledger/graphs/contributors)
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
