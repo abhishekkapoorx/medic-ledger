@@ -150,7 +150,7 @@ contract UserRegistry is Ownable, Pausable {
             role: UserRole.Doctor,
             name: _name,
             licenseIPFSHash: _licenseIPFSHash,
-            isVerified: true, // Doctors need verification
+            isVerified: false, // Doctors need verification
             isActive: true,
             registrationDate: block.timestamp
         });
@@ -187,7 +187,7 @@ contract UserRegistry is Ownable, Pausable {
             role: UserRole.Manufacturer,
             name: _name,
             licenseIPFSHash: _licenseIPFSHash,
-            isVerified: true, // Manufacturers need verification
+            isVerified: false, // Manufacturers need verification
             isActive: true,
             registrationDate: block.timestamp
         });
