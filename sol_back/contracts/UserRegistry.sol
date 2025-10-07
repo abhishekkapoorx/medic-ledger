@@ -17,6 +17,8 @@ contract UserRegistry is Ownable, Pausable {
     event UserVerified(address indexed userAddress, UserRole role);
     event UserDeactivated(address indexed userAddress);
     event UserReactivated(address indexed userAddress);
+    event VerifierAdded(address indexed verifier);
+    event VerifierRemoved(address indexed verifier);
     
     // Core user structure
     struct User {
@@ -96,7 +98,9 @@ contract UserRegistry is Ownable, Pausable {
      */
     function addVerifier(address _verifier) external onlyOwner {
         require(_verifier != address(0), "Invalid address");
+        require(!verifiers[_verifier], "Verifier already exists");
         verifiers[_verifier] = true;
+        emit VerifierAdded(_verifier);
     }
     
     /**
@@ -104,7 +108,9 @@ contract UserRegistry is Ownable, Pausable {
      * @param _verifier Address of the verifier to remove
      */
     function removeVerifier(address _verifier) external onlyOwner {
+        require(verifiers[_verifier], "Verifier does not exist");
         verifiers[_verifier] = false;
+        emit VerifierRemoved(_verifier);
     }
     
     /**
@@ -114,6 +120,8 @@ contract UserRegistry is Ownable, Pausable {
      */
     function registerPatient(string memory _name) external whenNotPaused returns (bool success) {
         require(users[msg.sender].walletAddress == address(0), "User already registered");
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(bytes(_name).length <= 100, "Name too long");
         
         users[msg.sender] = User({
             walletAddress: msg.sender,
@@ -143,7 +151,11 @@ contract UserRegistry is Ownable, Pausable {
         string memory _practiceAddress
     ) external whenNotPaused returns (bool success) {
         require(users[msg.sender].walletAddress == address(0), "User already registered");
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(bytes(_name).length <= 100, "Name too long");
         require(bytes(_licenseIPFSHash).length > 0, "License IPFS hash required");
+        require(bytes(_practiceAddress).length > 0, "Practice address cannot be empty");
+        require(bytes(_practiceAddress).length <= 200, "Practice address too long");
         
         users[msg.sender] = User({
             walletAddress: msg.sender,
@@ -180,7 +192,15 @@ contract UserRegistry is Ownable, Pausable {
         string memory _registrationNumber
     ) external whenNotPaused returns (bool success) {
         require(users[msg.sender].walletAddress == address(0), "User already registered");
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(bytes(_name).length <= 100, "Name too long");
         require(bytes(_licenseIPFSHash).length > 0, "License IPFS hash required");
+        require(bytes(_manufacturingAddress).length > 0, "Manufacturing address cannot be empty");
+        require(bytes(_manufacturingAddress).length <= 200, "Manufacturing address too long");
+        require(bytes(_gstNumber).length > 0, "GST number cannot be empty");
+        require(bytes(_gstNumber).length <= 50, "GST number too long");
+        require(bytes(_registrationNumber).length > 0, "Registration number cannot be empty");
+        require(bytes(_registrationNumber).length <= 50, "Registration number too long");
         
         users[msg.sender] = User({
             walletAddress: msg.sender,
@@ -215,7 +235,11 @@ contract UserRegistry is Ownable, Pausable {
         string memory _distributionAddress
     ) external whenNotPaused returns (bool success) {
         require(users[msg.sender].walletAddress == address(0), "User already registered");
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(bytes(_name).length <= 100, "Name too long");
         require(bytes(_licenseIPFSHash).length > 0, "License IPFS hash required");
+        require(bytes(_distributionAddress).length > 0, "Distribution address cannot be empty");
+        require(bytes(_distributionAddress).length <= 200, "Distribution address too long");
         
         users[msg.sender] = User({
             walletAddress: msg.sender,
@@ -248,7 +272,11 @@ contract UserRegistry is Ownable, Pausable {
         string memory _retailAddress
     ) external whenNotPaused returns (bool success) {
         require(users[msg.sender].walletAddress == address(0), "User already registered");
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(bytes(_name).length <= 100, "Name too long");
         require(bytes(_licenseIPFSHash).length > 0, "License IPFS hash required");
+        require(bytes(_retailAddress).length > 0, "Retail address cannot be empty");
+        require(bytes(_retailAddress).length <= 200, "Retail address too long");
         
         users[msg.sender] = User({
             walletAddress: msg.sender,
@@ -279,6 +307,8 @@ contract UserRegistry is Ownable, Pausable {
         string memory _governmentIdIPFSHash
     ) external whenNotPaused returns (bool success) {
         require(users[msg.sender].walletAddress == address(0), "User already registered");
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(bytes(_name).length <= 100, "Name too long");
         require(bytes(_governmentIdIPFSHash).length > 0, "Government ID IPFS hash required");
         
         users[msg.sender] = User({
@@ -305,8 +335,10 @@ contract UserRegistry is Ownable, Pausable {
      * @return success Boolean indicating success
      */
     function verifyUser(address _userAddress) external onlyVerifier whenNotPaused returns (bool success) {
+        require(_userAddress != address(0), "Invalid user address");
         require(users[_userAddress].walletAddress != address(0), "User not registered");
         require(!users[_userAddress].isVerified, "User already verified");
+        require(users[_userAddress].isActive, "User account is not active");
         
         users[_userAddress].isVerified = true;
         
@@ -320,6 +352,7 @@ contract UserRegistry is Ownable, Pausable {
      * @return success Boolean indicating success
      */
     function deactivateUser(address _userAddress) external onlyOwner returns (bool success) {
+        require(_userAddress != address(0), "Invalid user address");
         require(users[_userAddress].walletAddress != address(0), "User not registered");
         require(users[_userAddress].isActive, "User already deactivated");
         
@@ -335,6 +368,7 @@ contract UserRegistry is Ownable, Pausable {
      * @return success Boolean indicating success
      */
     function reactivateUser(address _userAddress) external onlyOwner returns (bool success) {
+        require(_userAddress != address(0), "Invalid user address");
         require(users[_userAddress].walletAddress != address(0), "User not registered");
         require(!users[_userAddress].isActive, "User already active");
         
